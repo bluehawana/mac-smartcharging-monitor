@@ -2,6 +2,14 @@ import Foundation
 import IOKit
 import Observation
 
+/// One power profile a charger offers: a voltage rail and the current
+/// it will supply on it.
+struct PDProfile: Equatable {
+    let mV: Int
+    let mA: Int
+    var watts: Int { (mV * mA) / 1_000_000 }
+}
+
 // MARK: - Snapshot
 
 /// One reading of the machine's power state, taken straight from
@@ -23,6 +31,26 @@ struct PowerSnapshot: Equatable {
     var adapterCurrentMA = 0
 
     var adapterDescription: String?
+
+    /// Every power profile the charger offered, as (millivolts, milliamps).
+    ///
+    /// This is the useful one. The charger builds this list *after* reading
+    /// the cable, so a cable with no e-marker forces every entry down to
+    /// 3000 mA. Comparing the best offer against what was negotiated
+    /// separates "this charger can't" from "this cable won't".
+    var advertisedProfiles: [PDProfile] = []
+
+    /// Best offer on the table, in watts.
+    var advertisedMaxW: Int {
+        advertisedProfiles.map(\.watts).max() ?? 0
+    }
+
+    /// True when nothing on offer exceeds the 3 A limit that applies to
+    /// cables without an identifying chip.
+    var cableCappedAt3A: Bool {
+        guard !advertisedProfiles.isEmpty else { return false }
+        return (advertisedProfiles.map(\.mA).max() ?? 0) <= 3000
+    }
 
     var batteryPercent = 0
     var batteryVoltageMV = 0
@@ -81,6 +109,9 @@ final class PowerMonitor {
     /// Peak adapter wattage seen this session — makes an intermittent
     /// power-sharing drop visible after the fact.
     private(set) var peakWattsSeen = 0
+
+    let health = BatteryHealthTracker()
+    private(set) var healthMetrics = HealthMetrics()
 
     private var timer: Timer?
     private var tick = 0
@@ -155,6 +186,14 @@ final class PowerMonitor {
             s.adapterVoltageMV   = Self.int(adapter["AdapterVoltage"]) ?? 0
             s.adapterCurrentMA   = Self.int(adapter["Current"]) ?? 0
             s.adapterDescription = adapter["Description"] as? String
+
+            if let menu = adapter["UsbHvcMenu"] as? [[String: Any]] {
+                s.advertisedProfiles = menu.compactMap { entry in
+                    guard let mV = Self.int(entry["MaxVoltage"]),
+                          let mA = Self.int(entry["MaxCurrent"]) else { return nil }
+                    return PDProfile(mV: mV, mA: mA)
+                }
+            }
         }
 
         if let charger = props["ChargerData"] as? [String: Any] {
@@ -177,15 +216,29 @@ final class PowerMonitor {
 
         // Process sampling shells out, so do it far less often than the
         // sensor read — and only while someone is actually watching.
+        health.record(s)
+
         tick &+= 1
         if isActive && tick % 3 == 0 {
             loads = ProcessWatch.topLoads()
+        }
+        // Metrics scan the whole log, so recompute occasionally, not every tick.
+        if tick % 15 == 1 {
+            healthMetrics = health.metrics()
         }
     }
 
     /// The heavy hitter worth naming, if there is one.
     var dominantAIRuntime: RunningLoad? {
         loads.first { $0.isAIRuntime && $0.cpuPercent > 20 }
+    }
+
+    var advice: [BatteryAdvice] {
+        BatteryCoach.advise(snapshot: snapshot, metrics: healthMetrics)
+    }
+
+    var plugAdvice: String {
+        BatteryCoach.plugAdvice(snapshot, aiRunning: dominantAIRuntime != nil)
     }
 
     // MARK: IOKit

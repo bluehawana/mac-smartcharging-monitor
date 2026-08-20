@@ -11,6 +11,7 @@ struct DashboardView: View {
             VStack(alignment: .leading, spacing: 30) {
                 liveStatus
                 explanation
+                batteryHealth
                 cableReference
                 sharingTrap
                 symptoms
@@ -108,6 +109,92 @@ struct DashboardView: View {
                         Text(e).font(Theme.label(10)).foregroundStyle(Theme.muted)
                     }
                 }
+            }
+        }
+    }
+
+    // MARK: - Battery health
+
+    private var batteryHealth: some View {
+        let m = monitor.healthMetrics
+        let advice = monitor.advice
+
+        return Section(title: "Battery life vs performance",
+                       blurb: "Being plugged in is not automatically bad for a battery. Being "
+                            + "plugged into something too small is — it forces the pack to cycle "
+                            + "while the chip runs hot, which are the two things that actually "
+                            + "wear cells out.") {
+
+            HStack(alignment: .top, spacing: 22) {
+                VStack(alignment: .leading, spacing: 3) {
+                    FieldLabel("This week")
+                    HStack(alignment: .firstTextBaseline, spacing: 6) {
+                        Text(m.hasEnoughData ? "\(m.stressScore)" : "—")
+                            .font(Theme.readout(30, weight: .bold))
+                        Text(m.hasEnoughData ? m.stressLabel : "gathering data")
+                            .font(.system(size: 12))
+                            .foregroundStyle(Theme.muted)
+                    }
+                }
+
+                Divider().frame(height: 44).overlay(Theme.hairline)
+
+                if m.hasEnoughData {
+                    HStack(spacing: 20) {
+                        Readout(label: "Above 90%",
+                                value: String(format: "%.0f", m.fractionAbove90 * 100),
+                                unit: "%", size: 17)
+                        Readout(label: "Over 35 °C",
+                                value: String(format: "%.1f", m.hoursAbove35C),
+                                unit: "h", size: 17)
+                        Readout(label: "Reversals",
+                                value: String(format: "%.0f", m.microCyclesPerHour),
+                                unit: "/h",
+                                tint: m.microCyclesPerHour >= 6 ? Theme.warn : .primary,
+                                size: 17)
+                        Readout(label: "Draining on AC",
+                                value: String(format: "%.1f", m.deficitHours),
+                                unit: "h",
+                                tint: m.deficitHours > 1 ? Theme.fail : .primary,
+                                size: 17)
+                    }
+                } else {
+                    Text("Leave the app running for an hour and this fills in.")
+                        .font(.system(size: 12.5))
+                        .foregroundStyle(Theme.muted)
+                }
+                Spacer(minLength: 0)
+            }
+            .padding(16)
+            .overlay(RoundedRectangle(cornerRadius: 4).stroke(Theme.hairline))
+
+            VStack(alignment: .leading, spacing: 5) {
+                FieldLabel("Right now")
+                Text(monitor.plugAdvice)
+                    .font(.system(size: 14))
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .padding(14)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(RoundedRectangle(cornerRadius: 4).fill(Theme.accent.opacity(0.10)))
+
+            ForEach(advice) { a in
+                HStack(alignment: .top, spacing: 10) {
+                    Image(systemName: a.kind == .good ? "checkmark.circle.fill"
+                                    : a.kind == .act ? "exclamationmark.triangle.fill"
+                                    : "eye.fill")
+                        .font(.system(size: 12))
+                        .foregroundStyle(a.kind == .good ? Theme.pass
+                                       : a.kind == .act ? Theme.warn : Theme.muted)
+                        .padding(.top, 2)
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text(a.title).font(.system(size: 13.5, weight: .semibold))
+                            .fixedSize(horizontal: false, vertical: true)
+                        Text(a.body).font(.system(size: 12.5)).foregroundStyle(Theme.muted)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+                .padding(.vertical, 2)
             }
         }
     }

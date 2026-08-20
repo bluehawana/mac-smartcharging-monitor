@@ -29,6 +29,15 @@ enum Probe {
                 row("Cable ceiling", "\(s.adapterCurrentMA) mA"
                     + (s.adapterCurrentMA <= 3000 ? "   (no e-marker — 3 A limit)" : ""))
                 if let desc = s.adapterDescription { row("Description", desc) }
+
+                if !s.advertisedProfiles.isEmpty {
+                    let offered = s.advertisedProfiles
+                        .map { "\($0.mV / 1000)V/\(String(format: "%.2f", Double($0.mA) / 1000))A" }
+                        .joined(separator: "  ")
+                    row("Offered", offered)
+                    row("Best offer", "\(s.advertisedMaxW) W"
+                        + (s.cableCappedAt3A ? "   (every profile capped at 3 A by the cable)" : ""))
+                }
             }
 
             row("Charge", "\(s.batteryPercent) %")

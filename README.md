@@ -13,6 +13,46 @@ you run a local model with **Ollama** or **oMLX**, which pushes an Apple silicon
 chip to close to its highest sustained draw — higher than compiling, higher than
 exporting video. Then the machine gets hot, throttles, and drains while plugged in.
 
+## Why this exists
+
+This started as a laptop that would not charge properly while running a local
+model. The machine was hot, slow, and losing battery — plugged in.
+
+The first clue was that the charger was a genuine 100 W unit and the Mac was
+reporting this:
+
+```
+$ ioreg -rn AppleSmartBattery | tr ',' '\n' | grep -E '"(Watts|Current)"='
+"Watts"=60
+"Current"=3000
+```
+
+3000 mA exactly. That is the ceiling the USB-PD standard applies to a cable
+with no e-marker chip — the charger wasn't weak, it was being refused. One
+cable later:
+
+```
+"Watts"=140
+"Current"=4990
+```
+
+Then, minutes later, on the same machine with the same cable:
+
+```
+"Watts"=100
+"Current"=4990
+```
+
+Nothing was unplugged. Nothing was announced. The supply had quietly dropped
+40 W, and macOS said "Charging" throughout.
+
+That is the entire problem. The numbers exist, they are exact, and they are
+completely invisible unless you go looking with `ioreg`. Most people never
+will — so they conclude the laptop is old, or the model is just slow, or the
+battery is failing.
+
+This app puts those numbers in the menu bar and says what they mean.
+
 ## What it does
 
 - **Lives in the menu bar.** Shows live delivered wattage. Close the window and
