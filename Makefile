@@ -3,7 +3,7 @@ BUNDLE   := build/$(APP).app
 CONFIG   := release
 BINARY   := .build/$(CONFIG)/$(APP)
 
-.PHONY: all build app run install clean icon preflight sign dmg notarize release verify
+.PHONY: all build app run install clean icon preflight sign dmg notarize release verify cask
 
 # Distribution settings.
 #
@@ -135,6 +135,31 @@ verify:
 	@echo "--- staple ---"
 	@xcrun stapler validate $(DMG) 2>&1 || true
 
-release: notarize verify
+release: notarize verify cask
 	@echo
 	@echo "$(DMG) is ready to upload to GitHub Releases."
+
+
+# Regenerate the Homebrew cask for the current version and checksum.
+#
+# Forgetting this after a release is the classic footgun: brew verifies the
+# sha256 before installing, so a stale cask fails for every user with a
+# checksum mismatch rather than a useful message.
+cask:
+	@test -f $(DMG) || { echo "error: $(DMG) not built — run 'make dmg' first"; exit 1; }
+	@printf 'cask "smartcharging" do\n' > packaging/smartcharging.rb
+	@printf '  version "$(VERSION)"\n' >> packaging/smartcharging.rb
+	@printf '  sha256 "%s"\n\n' "$$(shasum -a 256 $(DMG) | awk '{print $$1}')" >> packaging/smartcharging.rb
+	@printf '  url "https://github.com/bluehawana/mac-smartcharging-monitor/releases/download/v#{version}/SmartCharging-#{version}.dmg",\n' >> packaging/smartcharging.rb
+	@printf '      verified: "github.com/bluehawana/mac-smartcharging-monitor/"\n' >> packaging/smartcharging.rb
+	@printf '  name "Smart Charging"\n' >> packaging/smartcharging.rb
+	@printf '  desc "Menu bar monitor showing what your charger actually delivers"\n' >> packaging/smartcharging.rb
+	@printf '  homepage "https://github.com/bluehawana/mac-smartcharging-monitor"\n\n' >> packaging/smartcharging.rb
+	@printf '  depends_on macos: :sonoma\n\n' >> packaging/smartcharging.rb
+	@printf '  app "SmartCharging.app"\n\n' >> packaging/smartcharging.rb
+	@printf '  zap trash: [\n' >> packaging/smartcharging.rb
+	@printf '    "~/Library/Application Support/SmartCharging",\n' >> packaging/smartcharging.rb
+	@printf '    "~/Library/Preferences/com.bluehawana.smartcharging.plist",\n' >> packaging/smartcharging.rb
+	@printf '  ]\nend\n' >> packaging/smartcharging.rb
+	@ruby -c packaging/smartcharging.rb >/dev/null && echo "regenerated packaging/smartcharging.rb for $(VERSION)"
+	@echo "copy it to your tap:  cp packaging/smartcharging.rb ../homebrew-tap/Casks/"

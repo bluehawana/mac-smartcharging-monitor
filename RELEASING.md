@@ -85,7 +85,22 @@ That runs, in order:
 Notarisation usually takes a few minutes. The staple matters: it embeds the
 approval into the disk image so it validates even when the user is offline.
 
-Then upload `build/SmartCharging-<version>.dmg` to GitHub Releases.
+| `cask` | Regenerates the Homebrew cask with the new version and checksum |
+
+Then:
+
+```bash
+gh release create v1.0.0 build/SmartCharging-1.0.0.dmg \
+  --title "Smart Charging 1.0.0" --notes "..."
+cp packaging/smartcharging.rb ../homebrew-tap/Casks/
+cd ../homebrew-tap && git commit -am "smartcharging 1.0.0" && git push
+```
+
+The cask step is not optional. Homebrew verifies the sha256 before installing,
+so a stale cask fails for every user with a checksum mismatch rather than a
+useful message. `make release` regenerates it for exactly that reason — but
+copying it into the tap is still a manual step, since the tap is its own
+repository.
 
 ### If you hold more than one Developer ID
 
