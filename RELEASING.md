@@ -35,16 +35,21 @@ not your Apple ID password — create one at
 [appleid.apple.com](https://appleid.apple.com) under Sign-In and Security →
 App-Specific Passwords.
 
+Run it as a **single line** and omit `--password`. notarytool then gives you a
+secure prompt, so the password never reaches your shell history:
+
 ```bash
-xcrun notarytool store-credentials "smartcharging-notary" \
-  --apple-id "YOUR_APPLE_ID" \
-  --team-id "YOUR_TEAM_ID" \
-  --password "YOUR_APP_SPECIFIC_PASSWORD"
+xcrun notarytool store-credentials smartcharging-notary --apple-id YOUR_APPLE_ID --team-id YOUR_TEAM_ID
 ```
 
 This saves the credential into your login keychain under the profile name
 `smartcharging-notary`, which is what the Makefile looks for. You never have to
 pass the password again.
+
+If you see `unexpected arguments: 'notarytool', 'store-credentials', ...`, the
+command reached the shell twice — press **Ctrl+U** to clear the line and paste
+once. Backslash-continued versions of this command are easy to mangle on paste,
+which is why the single-line form is given here.
 
 Your Team ID is the parenthesised code in the certificate name above, and is
 also on the [membership page](https://developer.apple.com/account).
