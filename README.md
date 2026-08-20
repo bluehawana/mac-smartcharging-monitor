@@ -53,6 +53,36 @@ battery is failing.
 
 This app puts those numbers in the menu bar and says what they mean.
 
+## Same Mac, same cable, three ports
+
+The clearest demonstration of the problem. One laptop, one 240 W cable, one
+UGREEN Nexode 200 W charger — the only thing that changed between these three
+screenshots is **which port the cable was in**.
+
+### C1 — 140 W
+
+![140 W on the primary port](docs/images/port-c1-140w.png)
+
+The 28 V rail, which only exists on PD 3.1. Battery flow `+0.0 W` — the wall
+is carrying the entire load. This is the state you want to do heavy work in.
+
+### C2 — 100 W
+
+![100 W on the second port](docs/images/port-c2-100w.png)
+
+Cable ceiling still `4990 mA`, so the cable is provably identical. But the rail
+dropped to 20 V and the Mac is now pulling **117 W** against a 100 W supply,
+losing 16.9 W from the battery. Plugged in, and going down.
+
+### C3 — 30 W
+
+![30 W on the phone port](docs/images/port-c3-30w.png)
+
+The port meant for a phone. 12 V, 2480 mA, and a 47 W draw against it.
+
+Nothing was announced, nothing was faulty, and macOS said *Charging*
+throughout. A 110 W swing decided by which hole the cable went into.
+
 ## What it does
 
 - **Lives in the menu bar.** Shows live delivered wattage. Close the window and

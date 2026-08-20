@@ -67,10 +67,31 @@ struct Diagnosis: Equatable {
             ? " Right now your Mac is using more power than the charger supplies, so the battery is going down even though it is plugged in."
             : ""
 
+        // --- Low-priority port ------------------------------------------
+        // Checked before the cable, because a 30 W port also reports a low
+        // current ceiling and would otherwise be blamed on the cable. A real
+        // 3 A cable cap sits at 3000 mA on the 20 V rail; a slow port looks
+        // nothing like that — it negotiates a lower rail as well.
+        if s.adapterWatts > 0 && s.adapterWatts <= 35 {
+            return Diagnosis(
+                level: draining ? .critical : .warning,
+                headline: "Only \(s.adapterWatts) W is reaching your Mac",
+                detail: "That is far below what a laptop needs. On a multi-port charger this is "
+                      + "the slow port — the one meant for a phone. It can also mean a hub or "
+                      + "monitor in the middle passing very little power through."
+                      + deficitNote,
+                fix: "Move to the charger's main port — usually the one marked, or nearest the "
+                   + "edge — and plug the charger straight into the wall.",
+                evidence: evidence
+            )
+        }
+
         // --- Cable has no e-marker chip --------------------------------
-        // Above 3 A a cable must identify itself. 3000 mA exactly is the
-        // standard's hard ceiling for a cable that doesn't.
-        if s.adapterCurrentMA > 0 && s.adapterCurrentMA <= 3000 && s.adapterWatts <= 60 {
+        // Above 3 A a cable must identify itself. The signature is precise:
+        // every profile pinned at 3000 mA, on the full 20 V rail, landing on
+        // 60 W. Anything else that happens to be under 3 A is a different
+        // fault and must not be blamed on the cable.
+        if s.cableCappedAt3A && s.adapterVoltageMV >= 19000 && s.adapterWatts <= 60 {
             return Diagnosis(
                 level: draining ? .critical : .warning,
                 headline: "Your cable is holding you back",
@@ -97,20 +118,6 @@ struct Diagnosis: Equatable {
                 fix: "Unplug everything else from the charger, then unplug the charger itself "
                    + "from the wall for 15 seconds. Power-sharing can stay stuck until mains "
                    + "power is removed.",
-                evidence: evidence
-            )
-        }
-
-        // --- Low-priority port -----------------------------------------
-        if s.adapterWatts > 0 && s.adapterWatts <= 35 {
-            return Diagnosis(
-                level: draining ? .critical : .warning,
-                headline: "Only \(s.adapterWatts) W is reaching your Mac",
-                detail: "That is far below what a laptop needs. You are most likely in the "
-                      + "charger's low-priority port, or plugged into a hub or monitor that "
-                      + "passes very little power through." + deficitNote,
-                fix: "Move to the charger's main port — usually the one marked, or nearest the "
-                   + "edge — and plug the charger straight into the wall.",
                 evidence: evidence
             )
         }

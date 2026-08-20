@@ -110,3 +110,50 @@ exists at all.
 3. Note for the record: the iPhone/iPad 80% idea can only ever be an *alert*.
    No API lets a Mac stop an attached iOS device from charging, and there's no
    per-port power control on Apple silicon to cut it at the source.
+
+---
+
+## 2026-08-20 (later) — Screenshots caught a misdiagnosis
+
+Ran the app across all three USB-C ports of the Nexode 200 W and captured
+each. Same laptop, same 240 W cable throughout — only the port changed:
+
+| Port | Delivered | Rail | Cable ceiling | Draw | Battery |
+|------|----------:|-----:|--------------:|-----:|--------:|
+| C1 | 140 W | 28 V | 4990 mA | — | +0.0 W |
+| C2 | 100 W | 20 V | 4990 mA | 117 W | −16.9 W |
+| C3 | 30 W | 12 V | 2480 mA | 47 W | −17.2 W |
+
+A 110 W swing decided by which hole the cable went into, with no warning from
+macOS at any point. That table is now the top of the README — it makes the
+case better than any amount of prose.
+
+### The bug it exposed
+
+On C3 the app said **"Your cable is holding you back — the cable can only
+carry 3 amps."** Wrong, and provably so from the screenshots themselves: the
+same cable reports 4990 mA on C1. The cable was never the problem.
+
+Cause was rule ordering in `Diagnosis.evaluate`. The cable rule tested
+`adapterCurrentMA <= 3000 && adapterWatts <= 60`, and a 30 W port satisfies
+both — it negotiates 2480 mA, which is under 3000. The low-power-port rule
+that should have caught it sat *below* the cable rule and never ran.
+
+Two fixes:
+- Moved the low-priority-port check above the cable check.
+- Tightened the cable rule to the actual e-marker signature rather than a
+  loose inequality: every offered profile pinned at 3000 mA (`cableCappedAt3A`,
+  read from `UsbHvcMenu`) **and** the full 20 V rail **and** ≤60 W. A slow port
+  fails that test because it drops the rail too, which a cable cap never does.
+
+Lesson worth keeping: "under 3 amps" is not the e-marker signature. "Exactly
+3000 mA on 20 V" is. The loose version blames the cable for anything low, which
+is the single most expensive wrong answer this app could give — it sends
+someone out to buy a cable that won't fix anything.
+
+### Note
+
+The UI is now verified — it renders correctly in dark mode, the readouts align,
+the sparkline works, and the semantic colours read as intended (red at 30 W,
+amber at 100 W, green at 140 W). That closes the item flagged as unverified in
+the previous entry.
