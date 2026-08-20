@@ -308,3 +308,66 @@ this category — Mole, AlDente, coconutBattery — does, for these reasons. An
 App Store "monitor only" edition stays possible later if reach matters more
 than capability. TestFlight is not a shortcut around any of this; it carries
 the same sandbox and review requirements.
+
+---
+
+## 2026-08-20 (night) — Signed, notarised, shipped
+
+`make release VERSION=1.0.0` completed end to end. Apple returned
+`status: Accepted`, the ticket stapled, and Gatekeeper reports
+`source=Notarized Developer ID`.
+
+### The Gatekeeper gap worth knowing about
+
+First notarisation passed and stapled, but testing the *download* experience
+told a different story. Copying a file locally never sets the quarantine flag,
+so a local copy always opens even when a downloaded one would not. Faking it:
+
+```
+xattr -w com.apple.quarantine "0081;00000000;Safari;" file.dmg
+spctl -a -vvv -t open --context context:primary-signature file.dmg
+```
+
+Result: `rejected — source=no usable signature`.
+
+The app inside was correctly signed and notarised; the **disk image itself was
+not signed**. Notarising and stapling a `.dmg` does not sign it. Fixed by
+signing the image after `hdiutil create` and before submission — the order
+matters, because signing rewrites the file and would invalidate a staple
+applied first.
+
+After the fix the quarantined copy reports
+`accepted — source=Notarized Developer ID`.
+
+Lesson: verifying a release against an un-quarantined local copy proves
+nothing about what a downloader sees.
+
+### Two preflight checks, one of which was wrong
+
+`preflight` originally looked for the notary credential with
+`security find-generic-password`. It reported the credential missing straight
+after notarytool had saved it successfully — because notarytool stores it in
+the data-protection keychain, which the legacy `security` CLI cannot read.
+Replaced with a question to notarytool itself, which answers locally before
+making any network call.
+
+The certificate check was right and earned its place: the account had an
+**Apple Development** certificate, which cannot be notarised, and no
+**Developer ID Application** certificate. That is the usual first stumble and
+now fails with an explicit instruction rather than a signing error.
+
+### Credentials
+
+Nothing secret is stored in the repo, and nothing needs to be. The notary
+credential lives in the macOS keychain and is referenced only by profile name;
+the signing identity is discovered from the keychain at build time, so no
+personal name or team id is committed either. `.gitignore` now covers `.env`,
+`*.p8`, `*.p12`, `*.pem`, `*.key`, `*.cer`, `*.mobileprovision` and `AuthKey_*`
+defensively, and `.env.example` documents build-configuration overrides only —
+with an explicit note that writing an app-specific password into a file would
+be less safe than where it already is.
+
+### Not the App Store
+
+Direct distribution, per the sandbox testing above: an App Store build keeps
+the monitor but loses process attribution and can never carry a charge limit.

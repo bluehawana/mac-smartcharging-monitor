@@ -1,6 +1,25 @@
+# Build output
 .build/
 build/
-.DS_Store
+.swiftpm/
 *.xcuserstate
 xcuserdata/
-.swiftpm/
+.DS_Store
+
+# Local configuration — non-secret overrides only, but never committed
+.env
+.env.*
+!.env.example
+
+# Credentials and signing material. Nothing here should ever be tracked;
+# the real notary credential lives in the macOS keychain, not on disk.
+*.p8
+*.p12
+*.pem
+*.key
+*.cer
+*.certSigningRequest
+*.mobileprovision
+*.provisionprofile
+AuthKey_*
+secrets/

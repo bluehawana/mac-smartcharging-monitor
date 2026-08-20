@@ -11,6 +11,10 @@ BINARY   := .build/$(CONFIG)/$(APP)
 # personal name or team id is committed to a public repo. Override it if you
 # hold more than one Developer ID:
 #   make release DEV_ID="Developer ID Application: Your Name (TEAMID)"
+# Optional local overrides. Gitignored, and documented in .env.example —
+# build configuration only, never credentials.
+-include .env
+
 DEV_ID         ?= $(shell security find-identity -v -p codesigning 2>/dev/null | \
                     grep "Developer ID Application" | head -1 | \
                     sed -E 's/.*"(.*)".*/\1/')
@@ -80,8 +84,11 @@ preflight:
 		exit 1; \
 	fi
 	@echo "identity: $(DEV_ID)"
-	@if ! security find-generic-password -s 'com.apple.gke.notary.tool' \
-		-a '$(NOTARY_PROFILE)' >/dev/null 2>&1; then \
+	@# notarytool keeps credentials in the data-protection keychain, which the
+	@# `security` CLI cannot read — so ask notarytool instead of guessing at
+	@# a keychain item that will never be found.
+	@if xcrun notarytool history --keychain-profile '$(NOTARY_PROFILE)' 2>&1 \
+		| grep -q 'No Keychain password item'; then \
 		echo "error: no stored notary credential named '$(NOTARY_PROFILE)'."; \
 		echo "       See RELEASING.md step 2."; \
 		exit 1; \
@@ -103,7 +110,13 @@ dmg: sign
 	@hdiutil create -volname "$(APP)" -srcfolder $(STAGE) \
 		-ov -format ULFO $(DMG) >/dev/null
 	@rm -rf $(STAGE)
-	@echo "built $(DMG)"
+	@# Sign the image itself, not just the app inside it. Without this,
+	@# Gatekeeper reports "no usable signature" for the downloaded .dmg even
+	@# though the app within is notarised. Must happen before notarisation,
+	@# since signing rewrites the file and would invalidate a staple.
+	@codesign --force --timestamp --sign "$(DEV_ID)" $(DMG)
+	@codesign --verify --strict $(DMG)
+	@echo "built and signed $(DMG)"
 
 # Submit, wait for the verdict, then staple so it validates offline.
 notarize: dmg
