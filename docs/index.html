@@ -1061,6 +1061,83 @@ footer p { max-width: 72ch; }
   </div>
 </section>
 
+<!-- ============ THE SKILL ============ -->
+<section class="sec">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Also open source</span>
+      <h2>Publishing a Mac app? The screenshots are the other hard part.</h2>
+      <p>
+        Building Smart Charging turned up a second problem. Every App Store
+        screenshot generator targets iPhone, iPad and Android. The Mac App
+        Store wants 16:10 landscape at its own four sizes, flattened RGB with
+        no alpha, and it must show your real interface or the listing gets
+        rejected. Nothing covered it, so that got built too.
+      </p>
+    </div>
+
+    <div class="sym-grid" style="margin-bottom:26px">
+      <div class="sym">
+        <h3>Every size Apple accepts</h3>
+        <p>1280&times;800 through 2880&times;1800, flattened with no alpha channel &mdash; the thing that quietly fails an upload.</p>
+      </div>
+      <div class="sym">
+        <h3>Five layouts</h3>
+        <p>Text left, text right, centred, full-bleed showcase, and a big-number spotlight. Choosing well is most of what looks professional.</p>
+      </div>
+      <div class="sym">
+        <h3>Captures the window for you</h3>
+        <p>Point it at a running app and it finds the window itself, or use screenshots you already have.</p>
+      </div>
+      <div class="sym">
+        <h3>No dependencies</h3>
+        <p>One Swift file on CoreGraphics. No npm, no project scaffolding, no network, nothing to install.</p>
+      </div>
+    </div>
+
+    <h3 style="font-size:19px;margin:32px 0 6px">Install and run</h3>
+    <p style="color:var(--muted);font-size:14px">Three steps. Requires macOS and the Xcode command line tools.</p>
+
+    <div class="code">
+      <div class="code-bar"><span class="lab">Terminal</span><button class="copy" data-code="skill1">Copy</button></div>
+      <pre id="skill1">git clone https://github.com/bluehawana/appstore-screenshot-forapps
+cd appstore-screenshot-forapps
+swift makeshots.swift --layouts</pre>
+    </div>
+
+    <p class="note">
+      Then describe your slides in a small JSON file &mdash; image, headline,
+      subhead, layout &mdash; and render every size in one pass:
+    </p>
+
+    <div class="code">
+      <div class="code-bar"><span class="lab">Terminal</span><button class="copy" data-code="skill2">Copy</button></div>
+      <pre id="skill2">swift makeshots.swift screenshots.json</pre>
+    </div>
+
+    <p class="note">
+      Or grab a single file if you would rather not clone anything:
+    </p>
+
+    <div class="code">
+      <div class="code-bar"><span class="lab">Terminal</span><button class="copy" data-code="skill3">Copy</button></div>
+      <pre id="skill3">curl -O https://raw.githubusercontent.com/bluehawana/appstore-screenshot-forapps/main/makeshots.swift</pre>
+    </div>
+
+    <div class="cta-row">
+      <a class="btn btn-ghost" href="https://github.com/bluehawana/appstore-screenshot-forapps">
+        Screenshot generator on GitHub
+      </a>
+    </div>
+
+    <p class="note">
+      It ships a <code>SKILL.md</code>, so Claude Code and compatible agents
+      can drive it directly &mdash; drop the folder into your skills directory
+      and ask for App Store screenshots. MIT licensed.
+    </p>
+  </div>
+</section>
+
 <footer>
   <div class="wrap">
     <p>
