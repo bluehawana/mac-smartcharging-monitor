@@ -458,3 +458,37 @@ The battery health tracker now has real data and reads **Gentle** — 0% above
 90%, no time over 35 °C, 1–2 reversals/hour. Those reversals are the
 micro-cycling the module was written to measure, showing up exactly where
 predicted: on an undersized supply, sitting near break-even.
+
+---
+
+## 2026-08-20 (final) — Site carries both tools; launch framing settled
+
+The landing page now promotes the screenshot generator alongside the app, with
+three copy-ready install commands (clone, render, or curl the single file).
+The audience overlaps almost exactly: someone reading about Mac charging
+because they build Mac apps is the same person who will shortly need App Store
+screenshots and discover every generator targets iPhone and Android.
+
+Verified live at charging.bluehawana.com — both the brew one-liner and the
+screenshot section are being served.
+
+### Launch framing
+
+Rewrote the launch post to withhold explanations rather than deliver them.
+Three findings stated as numbers with no mechanism — 100 W charger giving
+60 W, one cable across three ports giving 140/100/30 W, and a port silently
+dropping to 22 W until replugged — so the only way to resolve the curiosity is
+to visit the page. The earlier draft explained everything up front, which read
+well but gave nobody a reason to click.
+
+Framed as "project #10 of my new year", which signals a body of work without
+claiming anything.
+
+### Still open
+
+- **HTTPS certificate** has not issued after roughly an hour. The post must
+  use the bare domain, not `https://`, until it does. If it stays pending,
+  remove and re-add the domain in repo Settings → Pages to force
+  revalidation, then enable `https_enforced`.
+- **The 30 W capture** is still pre-fix and cannot ship. Three verified slides
+  are ready via `screenshots-ready.json`.
