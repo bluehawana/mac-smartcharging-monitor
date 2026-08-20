@@ -1,0 +1,17 @@
+Regenerate store screenshots with:
+
+    swift Tools/makeshots.swift
+
+Output lands in docs/appstore/ (gitignored — it is build output).
+The generator is also published standalone at
+https://github.com/bluehawana/appstore-screenshot-forapps
+
+CAPTURE STATUS
+  cable-no-emarker-60w.png   current build, correct
+  port-c1-140w.png           current build, correct
+  port-c2-100w.png           current build, correct
+  port-c3-30w.png            STALE — taken 20:56, before the 20:59 fix.
+                             Shows "Your cable is holding you back" at 30 W,
+                             which is the bug that build had. Needs recapturing
+                             from the fixed app, which now correctly reports
+                             the port. Do not ship slide 2 until then.
