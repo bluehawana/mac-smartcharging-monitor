@@ -235,6 +235,49 @@ a { color: var(--accent); text-underline-offset: 3px; }
 }
 
 /* ============================================================
+   CALL TO ACTION
+   ============================================================ */
+.cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  margin-top: 26px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-radius: 3px;
+  font-family: var(--f-body);
+  font-size: 14.5px;
+  font-weight: 600;
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition: background .14s, border-color .14s;
+}
+.btn-primary { background: #4FC3D9; color: #06171B; }
+.btn-primary:hover { background: #6FD3E5; }
+.btn-ghost { border-color: #2F3B39; color: #CBD5D2; }
+.btn-ghost:hover { border-color: #4FC3D9; color: #FFFFFF; }
+
+.brewline {
+  font-family: var(--f-mono);
+  font-size: 12.5px;
+  color: #8B9995;
+  background: #0C1211;
+  border: 1px solid #232C2A;
+  border-radius: 3px;
+  padding: 11px 14px;
+  margin-top: 16px;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+.brewline b { color: #4FC3D9; font-weight: 400; }
+
+/* ============================================================
    SECTIONS
    ============================================================ */
 .sec { padding: 68px 0; border-bottom: 1px solid var(--line-soft); }
@@ -526,6 +569,24 @@ footer p { max-width: 72ch; }
           won't tell you — the menu bar cheerfully says <em>Charging</em> while the
           battery goes down. Here's how to find out what you're actually getting,
           and what to buy instead.
+        </p>
+
+        <div class="cta-row">
+          <a class="btn btn-primary"
+             href="https://github.com/bluehawana/mac-smartcharging-monitor/releases">
+            Download for macOS
+          </a>
+          <a class="btn btn-ghost"
+             href="https://github.com/bluehawana/mac-smartcharging-monitor">
+            Source on GitHub
+          </a>
+        </div>
+
+        <div class="brewline">$ <b>brew install --cask bluehawana/tap/smartcharging</b></div>
+
+        <p class="sub" style="font-size:14px;margin-top:14px">
+          Free and open source. Signed and notarised by Apple, so it opens
+          without a Gatekeeper warning.
         </p>
       </div>
 
@@ -939,6 +1000,54 @@ footer p { max-width: 72ch; }
         that one is correct by definition.
       </p>
     </div>
+  </div>
+</section>
+
+<!-- ============ THE APP ============ -->
+<section class="sec">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">The app</span>
+      <h2>Smart Charging puts these numbers in your menu bar</h2>
+      <p>
+        Everything on this page can be worked out by hand with
+        <code>ioreg</code>. Most people never will. Smart Charging reads the
+        same sensor continuously and says what the numbers mean in plain
+        language &mdash; which part of the chain is limiting you, and what to
+        do about it.
+      </p>
+    </div>
+
+    <div class="sym-grid">
+      <div class="sym">
+        <h3>Live wattage in the menu bar</h3>
+        <p>What your charger is actually delivering, at a glance. Close the window and it keeps measuring from the top right.</p>
+      </div>
+      <div class="sym">
+        <h3>Names the cause, not just the number</h3>
+        <p>60&nbsp;W and 65&nbsp;W are one watt apart and completely different problems. It tells you which one you have.</p>
+      </div>
+      <div class="sym">
+        <h3>Catches silent downgrades</h3>
+        <p>It remembers the best your charger has ever offered, so moving to a slower port does not go unnoticed.</p>
+      </div>
+      <div class="sym">
+        <h3>Battery health over time</h3>
+        <p>Heat exposure, time spent full, and the charge cycling that a borderline supply causes.</p>
+      </div>
+    </div>
+
+    <div class="cta-row">
+      <a class="btn btn-primary"
+         href="https://github.com/bluehawana/mac-smartcharging-monitor/releases">
+        Download for macOS
+      </a>
+      <a class="btn btn-ghost"
+         href="https://github.com/bluehawana/mac-smartcharging-monitor">
+        Source on GitHub
+      </a>
+    </div>
+    <p class="note">Requires macOS 14 or later. Apple silicon and Intel.</p>
   </div>
 </section>
 
