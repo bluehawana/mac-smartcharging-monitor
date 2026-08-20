@@ -65,10 +65,15 @@ final class ChargerMemory {
                  + "full power on one port only. Move back to the port you were using."
         }
         if nowA < best.maxMilliAmps - 200 {
+            // Same rail, lower current. Observed in the wild: a negotiation
+            // can settle below what the port can actually supply and stay
+            // there, and a reconnect restores it. Since that costs nothing to
+            // try and a cable swap does not, suggest it first.
             return "This charger has offered \(best.maxWatts) W before and is offering "
-                 + "\(s.advertisedMaxW) W now. The rail is unchanged but the current ceiling "
-                 + "dropped to \(nowA) mA, which is the cable — a different one, or a loose "
-                 + "connection on the one you have."
+                 + "\(s.advertisedMaxW) W now, on the same voltage. Unplug the cable and "
+                 + "plug it back in — a power negotiation can settle below what the port "
+                 + "can actually give and stay stuck there. If it does not recover, the "
+                 + "cable is the next thing to suspect."
         }
         return "This charger has offered \(best.maxWatts) W before and is offering "
              + "\(s.advertisedMaxW) W now. Check whether something else is plugged into it."

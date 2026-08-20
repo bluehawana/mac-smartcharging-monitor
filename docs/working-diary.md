@@ -411,3 +411,50 @@ Android. Five layouts, JSON config, optional window capture, no dependencies.
 4. **SMC charge limit** — the paid feature, and the reason this ships outside
    the App Store. The Developer ID and notarisation pipeline needed for its
    privileged helper are now in place.
+
+---
+
+## 2026-08-20 (late) — A third failure mode, found by running the app
+
+Plugged into the charger's 30 W port, the app read **22 W** on a 12 V rail with
+a 1830 mA ceiling. The offered menu was flat — 9 V/2.44 A and 12 V/1.83 A both
+land on 22 W — which reads like a phone brick, and I said so.
+
+Wrong. Unplugging and reconnecting the same cable in the same port restored
+**30 W** at 12 V/2500 mA.
+
+So the negotiation had settled *below what the port could actually supply* and
+stayed there. That is a third failure mode, distinct from the two the app
+already handled:
+
+| Symptom | Cause | Fix |
+|---|---|---|
+| 3000 mA on a full 20 V rail | Cable has no e-marker | Replace the cable |
+| Low rail (12 V, 15 V) | Slow port, or a hub in the way | Move to the main port |
+| **Same rail, lower current than before** | **Negotiation stuck low** | **Reconnect the cable** |
+
+### The gap it exposed
+
+`ChargerMemory.downgrade` treated "same rail, lower current" as evidence of a
+cable change — the only explanation I had when writing it. That is the most
+expensive wrong answer this app can give: it sends someone to buy a cable when
+reseating the one they own would have fixed it.
+
+Reworded to suggest the reconnect first, and only then the cable. A reconnect
+costs nothing to try; a cable does not.
+
+### Why this matters for the product
+
+Nobody would find this by hand. There is no symptom beyond "charging feels
+slow", the wattage is plausible, and the fix — unplug and replug — is
+indistinguishable from superstition unless you can see the number change.
+
+That is the clearest argument yet for the app existing: it turns an invisible
+degradation into a number you can watch recover.
+
+### Also confirmed working
+
+The battery health tracker now has real data and reads **Gentle** — 0% above
+90%, no time over 35 °C, 1–2 reversals/hour. Those reversals are the
+micro-cycling the module was written to measure, showing up exactly where
+predicted: on an undersized supply, sitting near break-even.
