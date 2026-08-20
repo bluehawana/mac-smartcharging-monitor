@@ -123,7 +123,19 @@ it is why the app reports the current ceiling rather than just the wattage.
 - **Explains it for non-technical users.** A built-in guide covering cables,
   MagSafe vs USB-C, multi-port power sharing, and what to buy in what order.
 
-## Build and run
+## Install
+
+Download the signed disk image from
+[Releases](https://github.com/bluehawana/mac-smartcharging-monitor/releases),
+open it, and drag Smart Charging to Applications.
+
+It is notarised by Apple, so it opens normally — no Gatekeeper warning, no
+right-click workaround, no trip to System Settings.
+
+To have it start with your Mac, add it in **System Settings → General →
+Login Items**.
+
+## Build from source
 
 Requires macOS 14+ and Xcode command line tools.
 
