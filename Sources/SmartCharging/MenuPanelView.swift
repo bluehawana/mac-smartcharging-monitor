@@ -102,6 +102,21 @@ struct MenuPanelView: View {
                     }
                     .fixedSize(horizontal: false, vertical: true)
             }
+
+            // Only something that remembers can say "you used to get more".
+            if let notice = monitor.downgradeNotice {
+                HStack(alignment: .top, spacing: 7) {
+                    Image(systemName: "arrow.down.right.circle.fill")
+                        .font(.system(size: 11))
+                        .foregroundStyle(Theme.warn)
+                        .padding(.top, 1)
+                    Text(notice)
+                        .font(.system(size: 11.5))
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .padding(9)
+                .background(RoundedRectangle(cornerRadius: 3).fill(Theme.warn.opacity(0.12)))
+            }
         }
         .padding(14)
     }

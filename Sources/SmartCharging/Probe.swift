@@ -53,6 +53,10 @@ enum Probe {
             row("Temperature", String(format: "%.1f °C", s.temperatureC))
 
             print(String(repeating: "─", count: 52))
+            if let notice = monitor.downgradeNotice {
+                print("⚠︎  " + wrap(notice, indent: 4))
+                print("")
+            }
             print(d.headline)
             print("")
             print(wrap(d.detail))

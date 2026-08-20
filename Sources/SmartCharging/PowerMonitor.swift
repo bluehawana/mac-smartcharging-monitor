@@ -111,7 +111,11 @@ final class PowerMonitor {
     private(set) var peakWattsSeen = 0
 
     let health = BatteryHealthTracker()
+    let chargerMemory = ChargerMemory()
     private(set) var healthMetrics = HealthMetrics()
+
+    /// Set when this charger has demonstrably done better before.
+    var downgradeNotice: String? { chargerMemory.downgrade(snapshot) }
 
     private var timer: Timer?
     private var tick = 0
@@ -217,6 +221,7 @@ final class PowerMonitor {
         // Process sampling shells out, so do it far less often than the
         // sensor read — and only while someone is actually watching.
         health.record(s)
+        chargerMemory.record(s)
 
         tick &+= 1
         if isActive && tick % 3 == 0 {
