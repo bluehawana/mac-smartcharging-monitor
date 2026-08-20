@@ -1,0 +1,1128 @@
+<title>Mac Charging Reality Check</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+
+<style>
+/* ============================================================
+   TOKENS — light palette defined on bare :root (the un-stamped
+   default state), then redefined for the two dark cases.
+   ============================================================ */
+:root {
+  --bg:        #EDEFEE;
+  --surface:   #F8FAF9;
+  --surface-2: #E3E7E5;
+  --ink:       #14181A;
+  --muted:     #5A6462;
+  --line:      #C6CFCC;
+  --line-soft: #D8DEDC;
+
+  --accent:    #0B6E7F;
+  --accent-ink:#FFFFFF;
+  --accent-wash:#DCEAED;
+
+  --pass:      #1B7F4B;
+  --pass-wash: #DBEDE3;
+  --warn:      #A96A00;
+  --warn-wash: #F4E7CF;
+  --fail:      #B3261E;
+  --fail-wash: #F5DEDC;
+
+  --plate:     #1B2220;
+  --plate-ink: #E9EEEC;
+
+  --f-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --f-body:    "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+  --f-mono:    "IBM Plex Mono", "SF Mono", Menlo, monospace;
+
+  --maxw: 1080px;
+  --r: 3px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:        #101413;
+    --surface:   #171D1B;
+    --surface-2: #202826;
+    --ink:       #E6EBE9;
+    --muted:     #96A29F;
+    --line:      #2E3836;
+    --line-soft: #242D2B;
+
+    --accent:    #4FC3D9;
+    --accent-ink:#08181C;
+    --accent-wash:#12303612;
+
+    --pass:      #52C98A;
+    --pass-wash: #14311F;
+    --warn:      #E0A64B;
+    --warn-wash: #33270F;
+    --fail:      #F0796F;
+    --fail-wash: #351916;
+
+    --plate:     #070A09;
+    --plate-ink: #DDE4E1;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg:        #101413;
+  --surface:   #171D1B;
+  --surface-2: #202826;
+  --ink:       #E6EBE9;
+  --muted:     #96A29F;
+  --line:      #2E3836;
+  --line-soft: #242D2B;
+
+  --accent:    #4FC3D9;
+  --accent-ink:#08181C;
+  --accent-wash:#123036;
+
+  --pass:      #52C98A;
+  --pass-wash: #14311F;
+  --warn:      #E0A64B;
+  --warn-wash: #33270F;
+  --fail:      #F0796F;
+  --fail-wash: #351916;
+
+  --plate:     #070A09;
+  --plate-ink: #DDE4E1;
+}
+
+/* ============================================================
+   BASE
+   ============================================================ */
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: 16px;
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+h1, h2, h3 {
+  font-family: var(--f-display);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+  margin: 0;
+  line-height: 1.08;
+}
+
+p { margin: 0; max-width: 68ch; }
+
+a { color: var(--accent); text-underline-offset: 3px; }
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Small-caps unit label — the spec-plate vernacular */
+.lab {
+  font-family: var(--f-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.num { font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+
+/* ============================================================
+   HERO — the readout
+   ============================================================ */
+.hero {
+  background: var(--plate);
+  color: var(--plate-ink);
+  border-bottom: 1px solid var(--line);
+  padding: 56px 0 0;
+}
+
+.hero .lab { color: #7D8B87; }
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 48px;
+  align-items: center;
+}
+
+.hero h1 {
+  font-size: clamp(38px, 6.2vw, 68px);
+  color: #FFFFFF;
+}
+
+.hero .kicker {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #4FC3D9;
+  margin-bottom: 18px;
+}
+
+.hero .sub {
+  color: #B4C0BC;
+  font-size: 17px;
+  margin-top: 20px;
+  max-width: 52ch;
+}
+
+/* the readout panel */
+.readout {
+  border: 1px solid #2C3634;
+  background: #0B0F0E;
+  padding: 22px;
+}
+
+.readout-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 0;
+  border-bottom: 1px solid #1D2523;
+}
+.readout-row:last-child { border-bottom: 0; }
+
+.readout-val {
+  font-family: var(--f-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 30px;
+  font-weight: 600;
+  color: #FFFFFF;
+  letter-spacing: -0.02em;
+}
+.readout-val small { font-size: 14px; color: #7D8B87; font-weight: 400; }
+
+#bigwatt { color: #4FC3D9; font-size: 58px; line-height: 1; }
+
+.verdict-strip {
+  margin-top: 18px;
+  padding: 12px 14px;
+  border: 1px solid #2C3634;
+  background: #121A18;
+  font-family: var(--f-mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: #52C98A;
+}
+
+.hero-foot {
+  margin-top: 52px;
+  border-top: 1px solid #232C2A;
+  padding: 16px 0 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 28px;
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #6E7C78;
+}
+
+/* ============================================================
+   SECTIONS
+   ============================================================ */
+.sec { padding: 68px 0; border-bottom: 1px solid var(--line-soft); }
+
+.sec-head { margin-bottom: 34px; }
+.sec-head h2 { font-size: clamp(25px, 3.4vw, 35px); margin-bottom: 12px; }
+.sec-head p { color: var(--muted); }
+
+.eyebrow {
+  font-family: var(--f-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  display: block;
+  margin-bottom: 14px;
+}
+
+/* ============================================================
+   PICKER
+   ============================================================ */
+.picker {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 26px;
+  margin-bottom: 30px;
+}
+
+fieldset {
+  border: 1px solid var(--line);
+  background: var(--surface);
+  padding: 18px;
+  margin: 0;
+  border-radius: var(--r);
+}
+legend { padding: 0 8px; }
+
+.opts { display: flex; flex-direction: column; gap: 7px; margin-top: 12px; }
+
+.opt {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 10px 12px;
+  border: 1px solid var(--line-soft);
+  background: var(--bg);
+  cursor: pointer;
+  font-size: 14.5px;
+  border-radius: var(--r);
+  transition: border-color .13s, background .13s;
+}
+.opt:hover { border-color: var(--accent); }
+.opt input { accent-color: var(--accent); margin: 0; flex: none; }
+.opt.sel { border-color: var(--accent); background: var(--accent-wash); }
+.opt .hint { margin-left: auto; color: var(--muted); font-family: var(--f-mono); font-size: 11px; }
+
+/* result */
+.result {
+  border: 1px solid var(--line);
+  background: var(--surface);
+  border-radius: var(--r);
+  overflow: hidden;
+}
+
+.result-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 10px 26px;
+  padding: 20px 22px;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface-2);
+}
+.result-top .big {
+  font-family: var(--f-mono);
+  font-size: 40px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+.result-top .big small { font-size: 16px; color: var(--muted); }
+
+.setups { display: flex; flex-direction: column; }
+
+.setup {
+  display: grid;
+  grid-template-columns: 30px 1fr auto auto;
+  gap: 16px;
+  align-items: center;
+  padding: 15px 22px;
+  border-bottom: 1px solid var(--line-soft);
+}
+.setup:last-child { border-bottom: 0; }
+
+.dot { width: 11px; height: 11px; border-radius: 50%; justify-self: center; }
+.dot.pass { background: var(--pass); }
+.dot.warn { background: var(--warn); }
+.dot.fail { background: var(--fail); }
+
+.setup-name { font-weight: 500; font-size: 14.5px; }
+.setup-name span { display: block; color: var(--muted); font-size: 12.5px; font-weight: 400; }
+
+.setup-w {
+  font-family: var(--f-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 19px;
+  font-weight: 600;
+}
+
+.tag {
+  font-family: var(--f-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 4px 9px;
+  border-radius: 2px;
+  white-space: nowrap;
+}
+.tag.pass { background: var(--pass-wash); color: var(--pass); }
+.tag.warn { background: var(--warn-wash); color: var(--warn); }
+.tag.fail { background: var(--fail-wash); color: var(--fail); }
+
+/* ============================================================
+   TABLES
+   ============================================================ */
+.tscroll { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); }
+
+table { border-collapse: collapse; width: 100%; min-width: 620px; font-size: 14.5px; }
+
+th {
+  text-align: left;
+  font-family: var(--f-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface-2);
+  white-space: nowrap;
+}
+
+td { padding: 13px 16px; border-bottom: 1px solid var(--line-soft); vertical-align: top; }
+tr:last-child td { border-bottom: 0; }
+
+td.n { font-family: var(--f-mono); font-variant-numeric: tabular-nums; font-weight: 500; white-space: nowrap; }
+td strong { font-weight: 600; }
+.sub-td { display: block; color: var(--muted); font-size: 12.5px; }
+
+/* ============================================================
+   SYMPTOMS
+   ============================================================ */
+.sym-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(268px, 1fr)); gap: 16px; }
+
+.sym {
+  border: 1px solid var(--line);
+  background: var(--surface);
+  border-radius: var(--r);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.sym h3 { font-size: 17px; font-family: var(--f-body); font-weight: 600; letter-spacing: 0; line-height: 1.35; }
+.sym p { font-size: 14px; color: var(--muted); }
+.sym .why {
+  font-size: 13.5px;
+  color: var(--ink);
+  border-left: 2px solid var(--accent);
+  padding-left: 12px;
+}
+
+/* ============================================================
+   CODE
+   ============================================================ */
+.code {
+  border: 1px solid var(--line);
+  background: var(--plate);
+  border-radius: var(--r);
+  overflow: hidden;
+  margin-top: 14px;
+}
+.code-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 14px;
+  border-bottom: 1px solid #2A3331;
+  background: #131A18;
+}
+.code-bar .lab { color: #7D8B87; }
+.code pre {
+  margin: 0;
+  padding: 15px 16px;
+  overflow-x: auto;
+  font-family: var(--f-mono);
+  font-size: 13px;
+  line-height: 1.75;
+  color: #DDE4E1;
+}
+.copy {
+  font-family: var(--f-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: transparent;
+  color: #4FC3D9;
+  border: 1px solid #2E3B39;
+  padding: 5px 10px;
+  border-radius: 2px;
+  cursor: pointer;
+}
+.copy:hover { background: #16211F; }
+
+/* numbered steps — a real sequence, so numbering earns its place */
+.steps { display: flex; flex-direction: column; gap: 22px; counter-reset: s; }
+.step {
+  display: grid;
+  grid-template-columns: 38px 1fr;
+  gap: 18px;
+  align-items: start;
+}
+.step::before {
+  counter-increment: s;
+  content: counter(s, decimal-leading-zero);
+  font-family: var(--f-mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+  padding-top: 4px;
+  letter-spacing: 0.06em;
+}
+.step h3 { font-size: 17px; font-family: var(--f-body); font-weight: 600; letter-spacing: 0; margin-bottom: 5px; }
+.step p { font-size: 14.5px; color: var(--muted); }
+
+/* callout */
+.callout {
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--warn);
+  background: var(--surface);
+  padding: 18px 20px;
+  border-radius: var(--r);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.callout .lab { color: var(--warn); }
+.callout p { font-size: 14.5px; }
+
+.note { font-size: 13px; color: var(--muted); margin-top: 16px; }
+
+footer { padding: 40px 0 60px; color: var(--muted); font-size: 13px; }
+footer p { max-width: 72ch; }
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 880px) {
+  .hero-grid { grid-template-columns: 1fr; gap: 34px; }
+  .picker { grid-template-columns: 1fr; }
+  .setup { grid-template-columns: 22px 1fr auto; row-gap: 8px; }
+  .setup .tag { grid-column: 3; }
+  .setup-w { grid-column: 2 / 3; }
+}
+
+@media (max-width: 560px) {
+  .wrap { padding: 0 18px; }
+  .sec { padding: 46px 0; }
+  #bigwatt { font-size: 46px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
+</style>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <div class="kicker">Power delivery · Apple silicon</div>
+        <h1>Your charger is probably lying to you.</h1>
+        <p class="sub">
+          A “100&nbsp;W” charger with the wrong cable delivers 60&nbsp;W. Your Mac
+          won't tell you — the menu bar cheerfully says <em>Charging</em> while the
+          battery goes down. Here's how to find out what you're actually getting,
+          and what to buy instead.
+        </p>
+      </div>
+
+      <div class="readout" role="img" aria-label="Power readout showing a real case: a Mac went from 60 watts delivered to 140 watts after fixing the cable.">
+        <div class="lab" style="margin-bottom:14px">Measured — one 16-inch MacBook&nbsp;Pro</div>
+        <div class="readout-row">
+          <span class="lab">Delivered</span>
+          <span class="readout-val" id="bigwatt">60<small>&nbsp;W</small></span>
+        </div>
+        <div class="readout-row">
+          <span class="lab">Rail voltage</span>
+          <span class="readout-val" id="volt">20<small>&nbsp;V</small></span>
+        </div>
+        <div class="readout-row">
+          <span class="lab">Cable ceiling</span>
+          <span class="readout-val" id="amp">3.0<small>&nbsp;A</small></span>
+        </div>
+        <div class="verdict-strip" id="vstrip">SAME CHARGER · SAME MAC · CABLE SWAPPED</div>
+      </div>
+    </div>
+
+    <div class="hero-foot">
+      <span>60 W → 140 W</span>
+      <span>2.3× more power</span>
+      <span>Cost of fix: one cable</span>
+    </div>
+  </div>
+</header>
+
+<!-- ============ WHY IT MATTERS ============ -->
+<section class="sec">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">The problem</span>
+      <h2>Running a local model turns a charging problem into a performance problem</h2>
+      <p>
+        Ordinary work — mail, browsing, documents — draws so little power that almost any
+        charger keeps up, and a weak one goes unnoticed for years. Local AI is different.
+        Ollama and oMLX push the GPU and memory bandwidth continuously, which is close to
+        the highest sustained power draw an Apple silicon chip can produce. Higher than
+        compiling. Higher than exporting video.
+      </p>
+    </div>
+
+    <div class="sym-grid">
+      <div class="sym">
+        <h3>Hot, loud, and still slow</h3>
+        <p>Fans at maximum but tokens crawl.</p>
+        <div class="why">When the power budget runs short, macOS throttles the chip to fit inside what the adapter can supply. You paid for a Max chip and are running it like a base model.</div>
+      </div>
+      <div class="sym">
+        <h3>“Charging” while the battery drops</h3>
+        <p>The menu bar says charging. The percentage falls anyway.</p>
+        <div class="why">macOS shows “Charging” whenever an adapter is attached. It does not mean you are gaining charge. If the machine draws more than the adapter supplies, the difference comes out of the battery.</div>
+      </div>
+      <div class="sym">
+        <h3>Never gets past 50%</h3>
+        <p>Plugged in all day, still stuck at half.</p>
+        <div class="why">The battery only gains ground in the gaps between generations. Over weeks it settles into a low band and never climbs out.</div>
+      </div>
+      <div class="sym">
+        <h3>Looks completely dead</h3>
+        <p>No keys, no screen, no response — as if it failed.</p>
+        <div class="why">Drained too far, the Mac writes memory to disk and shuts down. An undersized adapter can't accumulate enough charge to boot, so it stays dark. It isn't broken. Leave it on a proper adapter for 20–30 minutes.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PICKER ============ -->
+<section class="sec">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Find your answer</span>
+      <h2>What do you actually need?</h2>
+      <p>Pick your Mac and what you do with it. Both answers matter — the same laptop can need 35&nbsp;W or 140&nbsp;W depending on the job.</p>
+    </div>
+
+    <div class="picker">
+      <fieldset>
+        <legend class="lab">Your Mac</legend>
+        <div class="opts" id="macopts"></div>
+      </fieldset>
+
+      <fieldset>
+        <legend class="lab">What you're doing</legend>
+        <div class="opts" id="loadopts"></div>
+      </fieldset>
+    </div>
+
+    <div class="result">
+      <div class="result-top">
+        <div>
+          <div class="lab">Peak draw</div>
+          <div class="big num" id="need">—<small>&nbsp;W</small></div>
+        </div>
+        <div>
+          <div class="lab">Minimum adapter</div>
+          <div class="big num" id="rec">—<small>&nbsp;W</small></div>
+        </div>
+        <div style="flex:1 1 240px">
+          <div class="lab">Verdict</div>
+          <div id="verdict" style="font-size:14.5px;margin-top:3px">Choose above.</div>
+        </div>
+      </div>
+      <div class="setups" id="setups"></div>
+    </div>
+
+    <p class="note">
+      Draw figures are typical sustained values for these chips, rounded, and used to rank
+      setups — not a spec sheet. Your own number depends on screen brightness, external
+      displays, and which model you're running. The diagnostic commands further down
+      measure your real machine instead of estimating it.
+    </p>
+  </div>
+</section>
+
+<!-- ============ CABLES ============ -->
+<section class="sec">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Cables</span>
+      <h2>The cable sets a hard ceiling. Nothing gets past it.</h2>
+      <p>
+        Every USB-C cable carries a rating. Above 3&nbsp;amps a cable must contain a small
+        chip — an <strong>e-marker</strong> — that tells the charger it can handle more. No chip,
+        no permission, and the charger is required by the standard to stop at 3&nbsp;A. That is
+        the entire 60&nbsp;W trap: the charger isn't weak, it's being refused.
+      </p>
+    </div>
+
+    <div class="tscroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Cable</th><th>E-marker</th><th>Current</th><th>Voltage</th><th>Ceiling</th><th>How to spot it</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Basic USB-C</strong><span class="sub-td">Bundled with phones, cheap spares</span></td>
+            <td class="n">No</td><td class="n">3 A</td><td class="n">20 V</td>
+            <td class="n" style="color:var(--fail)">60 W</td>
+            <td>Thin, smooth plastic, no printing. If you don't know where it came from, assume this one.</td>
+          </tr>
+          <tr>
+            <td><strong>5 A e-marked</strong><span class="sub-td">USB-PD 3.0</span></td>
+            <td class="n">Yes</td><td class="n">5 A</td><td class="n">20 V</td>
+            <td class="n" style="color:var(--warn)">100 W</td>
+            <td>Usually printed “100W” on the connector or sleeve. Often braided.</td>
+          </tr>
+          <tr>
+            <td><strong>240 W e-marked</strong><span class="sub-td">USB-PD 3.1 EPR</span></td>
+            <td class="n">Yes</td><td class="n">5 A</td><td class="n">48 V</td>
+            <td class="n" style="color:var(--pass)">240 W</td>
+            <td>Printed “240W” or “EPR”. The only kind that can carry 140 W.</td>
+          </tr>
+          <tr>
+            <td><strong>Apple USB-C Charge Cable</strong><span class="sub-td">Ships with iPhone and small adapters</span></td>
+            <td class="n">Yes</td><td class="n">3 A</td><td class="n">20 V</td>
+            <td class="n" style="color:var(--fail)">60 W</td>
+            <td>Thin white plastic. Looks identical to the good one at a glance — this catches people constantly.</td>
+          </tr>
+          <tr>
+            <td><strong>Apple 240 W Charge Cable</strong><span class="sub-td">Ships with 140 W MacBook Pro</span></td>
+            <td class="n">Yes</td><td class="n">5 A</td><td class="n">48 V</td>
+            <td class="n" style="color:var(--pass)">240 W</td>
+            <td>Thick, fabric-woven. If it's woven, it's the good one.</td>
+          </tr>
+          <tr>
+            <td><strong>MagSafe 3 cable</strong><span class="sub-td">Magnetic, woven</span></td>
+            <td class="n">n/a</td><td class="n">5 A</td><td class="n">28 V</td>
+            <td class="n" style="color:var(--pass)">140 W</td>
+            <td>Obvious — magnetic flat connector. Needs a 140 W adapter behind it to reach 140 W.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout" style="margin-top:24px">
+      <span class="lab">The one that fools everyone</span>
+      <p>
+        Apple's thin white USB-C cable and Apple's woven 240&nbsp;W cable are both genuine Apple
+        cables, both e-marked, and both look like “the Apple cable.” One carries 60&nbsp;W, the
+        other 240&nbsp;W. <strong>Woven means fast. Smooth plastic means 60&nbsp;W.</strong>
+        That single texture check settles most cases.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MAGSAFE ============ -->
+<section class="sec">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">MagSafe vs USB-C</span>
+      <h2>MagSafe is a shape, not extra power</h2>
+      <p>A common assumption is that MagSafe charges faster. It doesn't — on current MacBook Pros both paths reach the same 140&nbsp;W. Choose on ergonomics.</p>
+    </div>
+
+    <div class="tscroll">
+      <table>
+        <thead><tr><th>&nbsp;</th><th>MagSafe 3</th><th>USB-C</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Maximum power</strong></td><td class="n">140 W</td><td class="n">140 W</td></tr>
+          <tr><td><strong>Needs a special cable</strong></td><td>The MagSafe cable itself</td><td>Yes — 240 W / PD 3.1 rated</td></tr>
+          <tr><td><strong>Survives a tripped cable</strong></td><td><strong style="color:var(--pass)">Yes</strong> — detaches magnetically</td><td>No — the laptop comes with it</td></tr>
+          <tr><td><strong>Uses up a USB-C port</strong></td><td><strong style="color:var(--pass)">No</strong></td><td>Yes</td></tr>
+          <tr><td><strong>Works with a third-party charger</strong></td><td>Yes, with a 140 W PD 3.1 adapter</td><td>Yes</td></tr>
+          <tr><td><strong>Carries data</strong></td><td>No</td><td>Yes</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="note">
+      Reaching 140&nbsp;W over USB-C requires a Mac that supports it. MacBook Pro models from
+      the M3 generation onward do; earlier Apple silicon MacBook Pros fast-charge through
+      MagSafe. If your Mac is older and you want the full rate, MagSafe is the path.
+    </p>
+  </div>
+</section>
+
+<!-- ============ MULTI-PORT TRAP ============ -->
+<section class="sec">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Multi-port chargers</span>
+      <h2>“200 W” on the box is not 200 W for your Mac</h2>
+      <p>
+        Multi-port chargers advertise their <em>total</em>. That total gets divided the moment
+        a second device appears — and on many models it divides even when the second device is
+        a fully charged phone drawing nothing. A typical 100&nbsp;W three-port charger behaves
+        like this:
+      </p>
+    </div>
+
+    <div class="tscroll">
+      <table>
+        <thead><tr><th>What's plugged in</th><th>Your Mac gets</th><th>Everything else</th><th>Result</th></tr></thead>
+        <tbody>
+          <tr><td>Mac alone, on the primary port</td><td class="n" style="color:var(--pass)">100 W</td><td class="n">—</td><td>Full rated power</td></tr>
+          <tr><td>Mac + anything in the second USB-C port</td><td class="n" style="color:var(--warn)">65 W</td><td class="n">30 W</td><td>Silently cut by a third</td></tr>
+          <tr><td>Mac + anything in USB-A</td><td class="n" style="color:var(--warn)">65 W</td><td class="n">22.5 W</td><td>Same penalty, even for a cable charging nothing</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout" style="margin-top:24px">
+      <span class="lab">Reading the numbers</span>
+      <p>
+        This is why the exact wattage matters when you check. <strong>60&nbsp;W means your cable
+        is the limit. 65&nbsp;W means the charger is splitting power.</strong> They're one watt
+        apart on paper and completely different problems — and 65&nbsp;W tells you to go look for
+        something plugged into another port.
+      </p>
+      <p>
+        Power-sharing can also stick. If a charger has divided its output once, it may hold that
+        split until mains power is removed. <strong>Unplug it from the wall for 15 seconds</strong>
+        — not just from the laptop — before concluding anything.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DIAGNOSE ============ -->
+<section class="sec">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Measure it</span>
+      <h2>Two commands tell you the truth</h2>
+      <p>
+        Open Terminal (press ⌘&nbsp;Space, type <em>Terminal</em>, press Return), paste, press
+        Return. Nothing here changes anything on your Mac — both commands only read.
+      </p>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div>
+          <h3>Plug in properly first</h3>
+          <p>Mac on the charger's primary port. Nothing in the other ports — check physically, including small dongles. Charger plugged directly into the wall, not a hub or extension.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div>
+          <h3>Ask what the adapter is delivering</h3>
+          <p>This is the headline number — what your Mac is actually receiving right now.</p>
+          <div class="code">
+            <div class="code-bar"><span class="lab">Terminal</span><button class="copy" data-code="c1">Copy</button></div>
+            <pre id="c1">system_profiler SPPowerDataType | grep -A6 "AC Charger Information"</pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div>
+          <h3>Ask why it's that number</h3>
+          <p><code>Current</code> is the cable's ceiling; <code>AdapterVoltage</code> shows which rail you're on. Together they name the culprit.</p>
+          <div class="code">
+            <div class="code-bar"><span class="lab">Terminal</span><button class="copy" data-code="c2">Copy</button></div>
+            <pre id="c2">ioreg -rn AppleSmartBattery | tr ',' '\n' | grep -E '"(Watts|Current|AdapterVoltage)"='</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="font-size:19px;margin:38px 0 14px">What your result means</h3>
+    <div class="tscroll">
+      <table>
+        <thead><tr><th>Watts</th><th>Current</th><th>Diagnosis</th><th>Fix</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="n" style="color:var(--fail)">60</td><td class="n">3000</td>
+            <td><strong>Cable has no e-marker.</strong> Capped at 3 A regardless of charger.</td>
+            <td>Replace the cable. Cheapest fix there is.</td>
+          </tr>
+          <tr>
+            <td class="n" style="color:var(--warn)">65</td><td class="n">3250</td>
+            <td><strong>Charger is splitting power.</strong> It thinks a second device is attached.</td>
+            <td>Empty the other ports, then unplug from the wall for 15 s.</td>
+          </tr>
+          <tr>
+            <td class="n" style="color:var(--warn)">30</td><td class="n">3000</td>
+            <td>You're on the charger's low-priority port, or it's mid-negotiation.</td>
+            <td>Move to the primary port and re-check after 10 s.</td>
+          </tr>
+          <tr>
+            <td class="n" style="color:var(--pass)">100</td><td class="n">5000</td>
+            <td>Full standard USB-PD. Fine for everything except sustained large-model work.</td>
+            <td>Nothing, unless you run big models.</td>
+          </tr>
+          <tr>
+            <td class="n" style="color:var(--pass)">140</td><td class="n">4990</td>
+            <td><strong>Full rate.</strong> Voltage will read 28000 — that rail only exists on PD 3.1.</td>
+            <td>Done.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout" style="margin-top:26px">
+      <span class="lab">Watching it under load</span>
+      <p>
+        To see whether you're winning or losing while a model runs, start a generation and
+        watch the battery current. Press&nbsp;<strong>Control&nbsp;+&nbsp;C</strong> to stop.
+      </p>
+      <div class="code" style="width:100%">
+        <div class="code-bar"><span class="lab">Terminal</span><button class="copy" data-code="c3">Copy</button></div>
+        <pre id="c3">while :; do ioreg -rn AppleSmartBattery | grep '"InstantAmperage"'; sleep 5; done</pre>
+      </div>
+      <p style="margin-top:10px">
+        A normal number means you're charging. A gigantic one like
+        <span class="num">18446744073709551394</span> is how macOS writes a negative value —
+        it means the battery is <em>draining</em> while plugged in. That's the whole problem,
+        visible in one line.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ BUY ============ -->
+<section class="sec">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">What to buy</span>
+      <h2>In order of what actually fixes things</h2>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div>
+          <h3>A 240 W / PD 3.1 USB-C cable — around €20</h3>
+          <p>
+            Buy this before anything else, and buy it even if you're sure your cable is fine.
+            It's the cheapest component, the most common failure, and it's required for any
+            speed above 100&nbsp;W later. Versions with a small wattage display on the connector
+            are worth the few euros more: you see the number without opening Terminal ever again.
+          </p>
+        </div>
+      </div>
+      <div class="step">
+        <div>
+          <h3>Test before buying a charger</h3>
+          <p>
+            With a proper cable, your existing charger may already deliver its full rating. If
+            that's enough for your workload, you're finished and you've spent €20 instead of €100.
+          </p>
+        </div>
+      </div>
+      <div class="step">
+        <div>
+          <h3>A 140 W-capable adapter — only if the test says so</h3>
+          <p>
+            Required for sustained large-model work on Pro and Max chips. Check the fine print
+            for <strong>140 W on a single port</strong> and <strong>PD 3.1</strong>. Many
+            “200 W” chargers cap every individual port at 100 W, which buys you nothing.
+            Apple's own 140 W adapter is the guaranteed-correct option.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout" style="margin-top:28px;border-left-color:var(--pass)">
+      <span class="lab" style="color:var(--pass)">Free things to try first</span>
+      <p>
+        Empty every other port on the charger. Unplug it from the wall for 15 seconds. Move to
+        the primary port. Try your other cable — if two cables give different wattages, the
+        higher one is the better cable. Plug into the wall directly rather than through a hub,
+        monitor, or extension lead. And if you still own the adapter that came with the Mac,
+        that one is correct by definition.
+      </p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p>
+      Built from a real diagnosis on a 16-inch MacBook&nbsp;Pro running a 27-billion-parameter
+      model under oMLX: a genuine 100&nbsp;W charger delivering 60&nbsp;W through an unmarked
+      cable, while the machine drew more than that at idle. Swapping the cable and adapter took
+      it to 140&nbsp;W at 28&nbsp;V.
+    </p>
+    <p style="margin-top:12px">
+      Wattage figures for cables, adapters, and charger power-sharing come from published USB-PD
+      specifications and manufacturer datasheets. Chip power-draw figures are typical sustained
+      values used for ranking, not measurements of your machine — run the commands above for that.
+    </p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------- hero readout: one orchestrated moment ---------- */
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var big = document.getElementById("bigwatt");
+  var volt = document.getElementById("volt");
+  var amp = document.getElementById("amp");
+  var vstrip = document.getElementById("vstrip");
+
+  function setHero(w, v, a) {
+    big.innerHTML = w + '<small>&nbsp;W</small>';
+    volt.innerHTML = v + '<small>&nbsp;V</small>';
+    amp.innerHTML = a + '<small>&nbsp;A</small>';
+  }
+
+  if (!reduce) {
+    setTimeout(function () {
+      var start = 60, end = 140, t0 = null;
+      vstrip.textContent = "CABLE REPLACED · RENEGOTIATING";
+      function frame(ts) {
+        if (t0 === null) t0 = ts;
+        var p = Math.min((ts - t0) / 1100, 1);
+        var eased = 1 - Math.pow(1 - p, 3);
+        var w = Math.round(start + (end - start) * eased);
+        setHero(w, w > 100 ? 28 : 20, w > 100 ? "5.0" : "3.0");
+        if (p < 1) requestAnimationFrame(frame);
+        else vstrip.textContent = "140 W @ 28 V · PD 3.1 · FULL RATE";
+      }
+      requestAnimationFrame(frame);
+    }, 900);
+  } else {
+    setHero(140, 28, "5.0");
+    vstrip.textContent = "140 W @ 28 V · PD 3.1 · FULL RATE";
+  }
+
+  /* ---------- picker data ----------
+     draw[] indexes align with LOADS below. Typical sustained
+     system watts, rounded — used for ranking, not as a spec. */
+  var MACS = [
+    { id: "air",  name: "MacBook Air",             hint: "M1–M4",       draw: [16, 24, 28, 30, 32] },
+    { id: "mb14", name: "MacBook Pro 14″",         hint: "base chip",   draw: [20, 42, 48, 55, 62] },
+    { id: "pro",  name: "MacBook Pro 14″/16″ Pro", hint: "Pro chip",    draw: [24, 58, 68, 76, 90] },
+    { id: "max",  name: "MacBook Pro 14″/16″ Max", hint: "Max chip",    draw: [26, 70, 82, 95, 115] }
+  ];
+
+  var LOADS = [
+    { id: "light", name: "Mail, web, documents",     hint: "light" },
+    { id: "dev",   name: "Coding, builds, Xcode",    hint: "bursty" },
+    { id: "media", name: "Video export, rendering",  hint: "heavy" },
+    { id: "llm1",  name: "Local model, 7–8B",        hint: "Ollama / oMLX" },
+    { id: "llm2",  name: "Local model, 27B+",        hint: "sustained max" }
+  ];
+
+  var SETUPS = [
+    { w: 60,  name: "Any charger + basic cable",       sub: "Unmarked 3 A cable — the default trap" },
+    { w: 65,  name: "Multi-port charger, sharing",     sub: "Something else plugged in alongside" },
+    { w: 100, name: "100 W charger + 5 A cable",       sub: "Standard USB-PD, correctly configured" },
+    { w: 140, name: "140 W charger + 240 W cable",     sub: "PD 3.1 — MagSafe or USB-C" }
+  ];
+
+  var macSel = 3, loadSel = 4;
+
+  function build(el, items, group, sel, onPick) {
+    el.innerHTML = "";
+    items.forEach(function (it, i) {
+      var lab = document.createElement("label");
+      lab.className = "opt" + (i === sel ? " sel" : "");
+      lab.innerHTML =
+        '<input type="radio" name="' + group + '" value="' + i + '"' +
+        (i === sel ? " checked" : "") + '>' +
+        '<span>' + it.name + '</span>' +
+        '<span class="hint">' + it.hint + '</span>';
+      lab.querySelector("input").addEventListener("change", function () {
+        onPick(i);
+      });
+      el.appendChild(lab);
+    });
+  }
+
+  function render() {
+    build(document.getElementById("macopts"), MACS, "mac", macSel, function (i) {
+      macSel = i; render();
+    });
+    build(document.getElementById("loadopts"), LOADS, "load", loadSel, function (i) {
+      loadSel = i; render();
+    });
+
+    var need = MACS[macSel].draw[loadSel];
+
+    document.getElementById("need").innerHTML = need + '<small>&nbsp;W</small>';
+
+    // Minimum adapter: enough for the load plus real charging headroom.
+    var min = 60;
+    if (need > 55) min = 100;
+    if (need > 85) min = 140;
+    if (need <= 30) min = 35;
+    document.getElementById("rec").innerHTML = min + '<small>&nbsp;W</small>';
+
+    var vEl = document.getElementById("verdict");
+    if (loadSel >= 3 && need > 85) {
+      vEl.innerHTML = "This is the case that breaks chargers. You need <strong>140 W</strong> to charge while you work.";
+    } else if (loadSel >= 3) {
+      vEl.innerHTML = "Sustained load. A correct <strong>100 W</strong> setup keeps up; a 60 W one won't.";
+    } else {
+      vEl.innerHTML = "Undemanding. Almost any correct cable and charger will do.";
+    }
+
+    var out = document.getElementById("setups");
+    out.innerHTML = "";
+    SETUPS.forEach(function (s) {
+      var head = s.w - need;          // watts left over for the battery
+      var cls, tag, msg;
+      if (head < 0) {
+        cls = "fail"; tag = "Drains";
+        msg = "Battery loses " + Math.abs(head) + " W while you work";
+      } else if (head < 20) {
+        cls = "warn"; tag = "Break-even";
+        msg = "Only " + head + " W spare — charges barely, if at all";
+      } else {
+        cls = "pass"; tag = "Charges";
+        msg = head + " W spare for the battery";
+      }
+      var row = document.createElement("div");
+      row.className = "setup";
+      row.innerHTML =
+        '<span class="dot ' + cls + '"></span>' +
+        '<span class="setup-name">' + s.name + '<span>' + s.sub + ' · ' + msg + '</span></span>' +
+        '<span class="setup-w">' + s.w + ' W</span>' +
+        '<span class="tag ' + cls + '">' + tag + '</span>';
+      out.appendChild(row);
+    });
+  }
+
+  render();
+
+  /* ---------- copy buttons ---------- */
+  document.querySelectorAll(".copy").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var src = document.getElementById(btn.getAttribute("data-code"));
+      if (!src) return;
+      var text = src.textContent;
+      var done = function () {
+        var old = btn.textContent;
+        btn.textContent = "Copied";
+        setTimeout(function () { btn.textContent = old; }, 1400);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done, function () {
+          selectNode(src); btn.textContent = "Press ⌘C";
+        });
+      } else {
+        selectNode(src);
+        btn.textContent = "Press ⌘C";
+      }
+    });
+  });
+
+  function selectNode(node) {
+    var r = document.createRange();
+    r.selectNodeContents(node);
+    var sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(r);
+  }
+})();
+</script>
