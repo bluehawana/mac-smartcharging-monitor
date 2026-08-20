@@ -8,7 +8,7 @@ cask "smartcharging" do
   desc "Menu bar monitor showing what your charger actually delivers"
   homepage "https://github.com/bluehawana/mac-smartcharging-monitor"
 
-  depends_on macos: ">= :sonoma"
+  depends_on macos: :sonoma
 
   app "SmartCharging.app"
 
