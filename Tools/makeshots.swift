@@ -206,21 +206,61 @@ enum Capture {
         return found.sorted { $0.1 > $1.1 }
     }
 
+    /// Every window the capture API will admit to, regardless of owner.
+    /// Empty means no Screen Recording permission — there is always at least
+    /// one window on a running Mac.
+    static func allWindows() -> [[String: Any]] {
+        let options: CGWindowListOption = [.optionOnScreenOnly, .excludeDesktopElements]
+        return (CGWindowListCopyWindowInfo(options, kCGNullWindowID) as? [[String: Any]]) ?? []
+    }
+
+    static func isRunning(_ appName: String) -> Bool {
+        NSWorkspace.shared.runningApplications.contains {
+            ($0.localizedName ?? "").localizedCaseInsensitiveContains(appName)
+                || ($0.bundleIdentifier ?? "").localizedCaseInsensitiveContains(appName)
+        }
+    }
+
     @discardableResult
     static func window(ofApp appName: String, to path: String) -> Bool {
         let windows = windowIDs(forApp: appName)
         guard let target = windows.first else {
-            let msg = """
-                no on-screen window found for "\(appName)".
+            // Three different failures look identical from here, so separate
+            // them: an app that is not running, an app running without a
+            // visible window (common for menu bar apps), and a terminal
+            // without Screen Recording permission.
+            let anyVisible = !allWindows().isEmpty
+            let msg: String
 
-                Either the app is not running with a visible window, or this
-                terminal lacks Screen Recording permission — without it macOS
-                hides every window from the capture API.
+            if !anyVisible {
+                msg = """
+                    cannot see any windows at all.
 
-                Grant it in System Settings > Privacy & Security > Screen
-                Recording, add your terminal, then restart the terminal.
+                    This terminal is missing Screen Recording permission —
+                    without it macOS hides every window from the capture API.
 
-                """
+                    System Settings > Privacy & Security > Screen Recording,
+                    add your terminal, then restart it.
+
+                    """
+            } else if isRunning(appName) {
+                msg = """
+                    "\(appName)" is running but has no visible window.
+
+                    Menu bar apps commonly sit with no window open. Open the
+                    window you want to capture first — for a menu bar app,
+                    click its icon and choose whatever opens a window.
+
+                    """
+            } else {
+                msg = """
+                    no running app matches "\(appName)".
+
+                    Check the name with:  swift makeshots.swift --windows <name>
+                    Partial names work, and matching is case-insensitive.
+
+                    """
+            }
             FileHandle.standardError.write(Data(msg.utf8))
             return false
         }
