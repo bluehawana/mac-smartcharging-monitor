@@ -157,3 +157,18 @@ The UI is now verified — it renders correctly in dark mode, the readouts align
 the sparkline works, and the semantic colours read as intended (red at 30 W,
 amber at 100 W, green at 140 W). That closes the item flagged as unverified in
 the previous entry.
+
+### Control test — the cable, isolated
+
+A third cable (Cirafon, generic) produced 60 W at 20 V with a 3000 mA ceiling.
+Tested across four combinations — UGREEN C1 and C2, into both the left and
+right Type-C ports on the Mac — and the number never moved off 60 W.
+
+Change every port on both ends, no effect. Swap only the cable, 140 W. That is
+about as clean an isolation as this kind of fault allows, and it is now in the
+README as the control table.
+
+It also confirms the tightened rule works on real hardware in both directions:
+this reading correctly says **cable** (3000 mA on a full 20 V rail), while the
+30 W port reading correctly says **port** (12 V). Before the fix, both said
+"cable".

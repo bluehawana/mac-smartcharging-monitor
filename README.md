@@ -83,6 +83,34 @@ The port meant for a phone. 12 V, 2480 mA, and a 47 W draw against it.
 Nothing was announced, nothing was faulty, and macOS said *Charging*
 throughout. A 110 W swing decided by which hole the cable went into.
 
+### And then the cable, on the 140 W port
+
+![60 W from a cable with no e-marker](docs/images/cable-no-emarker-60w.png)
+
+A different cable, in the *same* 140 W port that gave 140 W above. 60 W.
+
+The two numbers that name the cause sit side by side: the rail is the full
+**20 V**, so the charger went all the way to its top tier and the port is
+fine — and the current stops dead at **3000 mA**, which is the ceiling the
+USB-PD spec applies to a cable carrying no e-marker chip.
+
+**A weak port lowers the voltage. A weak cable lowers the current.** Compare
+against the 30 W shot above, where the rail dropped to 12 V instead. Same
+symptom to a human — "it charges slowly" — and completely different fixes.
+
+The control test settles it. That same cable was tried in four combinations:
+
+| Charger port | Mac port | Result |
+|---|---|---:|
+| UGREEN C1 (140 W) | right | 60 W |
+| UGREEN C1 (140 W) | left | 60 W |
+| UGREEN C2 (100 W) | right | 60 W |
+| UGREEN C2 (100 W) | left | 60 W |
+
+Change every port on both ends and the number does not move. Swap only the
+cable and it goes to 140 W. That is what a cable-limited link looks like, and
+it is why the app reports the current ceiling rather than just the wattage.
+
 ## What it does
 
 - **Lives in the menu bar.** Shows live delivered wattage. Close the window and
@@ -145,13 +173,22 @@ oMLX, pulling **121 W** against a 100 W supply.
 The exact wattage identifies the fault. These are one watt apart and mean
 entirely different things:
 
-| Watts | Current | What it means | Fix |
-|------:|--------:|---------------|-----|
-| 60 | 3000 mA | Cable has no e-marker chip, hard-capped at 3 A | Replace the cable |
-| 65 | 3250 mA | Charger is splitting power between ports | Empty other ports, unplug from mains 15 s |
-| 30 | 3000 mA | Low-priority port, or a hub/monitor in the way | Move to the charger's main port |
-| 100 | 5000 mA | Full standard USB-PD | Fine unless you run large models |
-| 140 | 4990 mA | Full PD 3.1 — note the 28 V rail | Nothing |
+| Watts | Rail | Current | What it means | Fix |
+|------:|-----:|--------:|---------------|-----|
+| 60 | 20 V | **3000 mA** | Cable has no e-marker chip, hard-capped at 3 A | Replace the cable |
+| 65 | 20 V | 3250 mA | Charger is splitting power between ports | Empty other ports, unplug from mains 15 s |
+| 30 | **12 V** | 2480 mA | Slow port, or a hub/monitor in the way | Move to the charger's main port |
+| 100 | 20 V | 4990 mA | Full standard USB-PD | Fine unless you run large models |
+| 140 | **28 V** | 4990 mA | Full PD 3.1 | Nothing |
+
+Read the rail and the current together, not the wattage alone:
+
+- **The current stops at 3000 mA on a full 20 V rail** → the cable. The charger
+  offered its top tier and the cable refused to carry it.
+- **The rail itself is low** (12 V, 15 V) → the port or a hub. A cable cap never
+  lowers the voltage.
+- **28 V** → PD 3.1. That rail does not exist otherwise, so seeing it proves
+  EPR end to end.
 
 Above 3 amps, a USB-C cable must contain an identifying chip called an
 **e-marker**. Without one the charger is *required by the standard* to stop at
