@@ -5,26 +5,47 @@
     {
       "file": "cable-no-emarker-60w.png",
       "headline": "Your charger says 100 W.\nYou are getting 60.",
-      "subhead": "macOS says \u201cCharging\u201d while the battery goes down. Smart Charging shows the real number.",
-      "tint": [0.94, 0.47, 0.44]
+      "subhead": "macOS says “Charging” while the battery goes down. Smart Charging shows the real number.",
+      "tint": [
+        0.94,
+        0.47,
+        0.44
+      ],
+      "layout": "hero-left"
     },
     {
       "file": "port-c3-30w.png",
       "headline": "It names the cause,\nnot just the number.",
-      "subhead": "A weak cable lowers the current. A weak port lowers the voltage. Both feel like \u201cslow charging\u201d and need opposite fixes.",
-      "tint": [0.88, 0.65, 0.29]
+      "subhead": "A weak cable lowers the current. A weak port lowers the voltage. Both feel like “slow charging” and need opposite fixes.",
+      "tint": [
+        0.88,
+        0.65,
+        0.29
+      ],
+      "layout": "spotlight",
+      "stat": "30 W"
     },
     {
       "file": "port-c1-140w.png",
       "headline": "And tells you\nwhen it is right.",
-      "subhead": "140 W on the 28 V rail \u2014 PD 3.1 end to end, with the wall carrying the whole load.",
-      "tint": [0.32, 0.79, 0.54]
+      "subhead": "140 W on the 28 V rail — PD 3.1 end to end, with the wall carrying the whole load.",
+      "tint": [
+        0.32,
+        0.79,
+        0.54
+      ],
+      "layout": "hero-right"
     },
     {
       "file": "port-c2-100w.png",
       "headline": "Built for people\nrunning local models.",
       "subhead": "Ollama and oMLX push an Apple silicon chip near its sustained limit. That is when an undersized charger stops hiding.",
-      "tint": [0.31, 0.76, 0.85]
+      "tint": [
+        0.31,
+        0.76,
+        0.85
+      ],
+      "layout": "centered"
     }
   ]
 }
