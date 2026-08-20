@@ -1,17 +1,32 @@
-Regenerate store screenshots with:
+Two configs:
 
-    swift Tools/makeshots.swift
+  screenshots-ready.json   Only captures verified against the current build.
+                           SAFE TO SHIP. Renders to docs/appstore-ready/
+  screenshots.json         Full four-slide set including the 30 W spotlight.
+                           BLOCKED until port-c3-30w.png is recaptured.
 
-Output lands in docs/appstore/ (gitignored — it is build output).
-The generator is also published standalone at
-https://github.com/bluehawana/appstore-screenshot-forapps
+    swift Tools/makeshots.swift screenshots-ready.json
+    swift Tools/makeshots.swift                          # full set
+
+Output is gitignored — it is build output. The generator is published
+standalone at github.com/bluehawana/appstore-screenshot-forapps
 
 CAPTURE STATUS
   cable-no-emarker-60w.png   current build, correct
   port-c1-140w.png           current build, correct
   port-c2-100w.png           current build, correct
-  port-c3-30w.png            STALE — taken 20:56, before the 20:59 fix.
-                             Shows "Your cable is holding you back" at 30 W,
-                             which is the bug that build had. Needs recapturing
-                             from the fixed app, which now correctly reports
-                             the port. Do not ship slide 2 until then.
+  port-c3-30w.png            STALE. Captured 20:56, three minutes before the
+                             20:59 fix. Shows "Your cable is holding you back"
+                             on a 30 W / 12 V port, which is the port, not the
+                             cable — the exact bug that fix corrected.
+
+TO UNBLOCK THE FOURTH SLIDE
+  1. Plug the cable into the charger's 30 W port (C3 on a Nexode 200 W)
+  2. Make sure the running app is the current build
+  3. Cmd-Shift-4, then Space, then click the Smart Charging window
+  4. Save over docs/images/port-c3-30w.png
+  5. swift Tools/makeshots.swift
+
+  It should read "Only 30 W is reaching your Mac ... this is the slow port."
+  Re-running the generator without step 4 changes nothing: it composites the
+  PNGs already on disk, it does not take screenshots.

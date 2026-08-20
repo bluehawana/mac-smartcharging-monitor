@@ -2,6 +2,7 @@
 .build/
 build/
 docs/appstore/
+docs/appstore-ready/
 .swiftpm/
 *.xcuserstate
 xcuserdata/
