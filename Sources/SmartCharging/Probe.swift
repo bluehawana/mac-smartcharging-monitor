@@ -57,6 +57,15 @@ enum Probe {
             row("Health", "\(s.healthPercent) %  ·  \(s.cycleCount) cycles")
             row("Temperature", String(format: "%.1f °C", s.temperatureC))
 
+            let loads = ProcessWatch.topLoads()
+            if loads.isEmpty {
+                row("Top processes", "unavailable (sandboxed?)")
+            } else {
+                row("Top processes", loads
+                    .map { "\($0.name) \(Int($0.cpuPercent))%" + ($0.isAIRuntime ? " [AI]" : "") }
+                    .joined(separator: ", "))
+            }
+
             print(String(repeating: "─", count: 52))
             if let notice = monitor.downgradeNotice {
                 print("⚠︎  " + wrap(notice, indent: 4))

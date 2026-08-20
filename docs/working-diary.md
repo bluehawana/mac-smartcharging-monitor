@@ -282,3 +282,29 @@ finished art, so a palette change is a one-line edit. A bolt inside a gauge
 arc that is deliberately *short* of full — the app is about the gap between
 what you should be getting and what you are. `make icon` regenerates the
 `.icns`.
+
+### App Store viability — tested, not assumed
+
+App Store (and TestFlight, which submits through the same pipeline) requires
+the app to be sandboxed. Rather than guess what survives that, the bundle was
+re-signed with `com.apple.security.app-sandbox` and run:
+
+| Capability | Sandboxed | Notes |
+|---|---|---|
+| `AppleSmartBattery` read via IOKit | **works** | Full reading: watts, rail, current, flow, health |
+| `ProcessWatch` via `/bin/ps` | **blocked** | Returns nothing; `Process` cannot exec in the sandbox |
+| SMC charge limit | **impossible** | Needs a privileged helper, which App Store apps cannot install |
+
+So an App Store build is possible but loses process attribution — the "oMLX is
+what your charger is losing to" feature — and can never carry the charge limit
+that was meant to be the paid anchor.
+
+`--probe` now prints top processes, partly because it is useful and partly
+because it makes this exact difference visible from the command line.
+
+Conclusion: direct distribution (Developer ID + notarisation) first. It keeps
+every feature, avoids the platform cut, and is what every comparable app in
+this category — Mole, AlDente, coconutBattery — does, for these reasons. An
+App Store "monitor only" edition stays possible later if reach matters more
+than capability. TestFlight is not a shortcut around any of this; it carries
+the same sandbox and review requirements.
