@@ -371,3 +371,43 @@ be less safe than where it already is.
 
 Direct distribution, per the sandbox testing above: an App Store build keeps
 the monitor but loses process attribution and can never carry a charge limit.
+
+---
+
+## 2026-08-20 (end of day) — Shipped
+
+Smart Charging 1.0.0 is signed, notarised, and published. Verified end to end
+against a quarantined copy — the file a browser actually produces — which
+reports `accepted, source=Notarized Developer ID`.
+
+Two install paths work:
+
+    brew install --cask bluehawana/tap/smartcharging
+    or the .dmg from GitHub Releases
+
+Landing page live at http://charging.bluehawana.com — a subdomain, because the
+account's user site claims www.bluehawana.com and that domain resolves to
+Cloudflare rather than GitHub Pages. Every project page under the account gets
+redirected there and lands on the portfolio instead, which no setting on the
+project repo can override. A dedicated subdomain sidesteps the handoff
+entirely.
+
+Also shipped: bluehawana/appstore-screenshot-forapps, a Mac App Store
+screenshot generator, built because every existing tool targets iPhone and
+Android. Five layouts, JSON config, optional window capture, no dependencies.
+
+### Open
+
+1. **HTTPS certificate** still pending with GitHub after ~30 minutes. Share
+   http:// until it issues. If still pending, remove and re-add the domain in
+   repo Settings → Pages to force revalidation, then enable enforcement.
+2. **The 30 W capture.** Every screenshot taken before 21:10:53 came from the
+   pre-fix build and shows the app blaming the cable for a slow port. To
+   redo: plug into the charger's 30 W port, open the app window, then
+   `swift Tools/makeshots.swift --capture "SmartCharging" docs/images/port-c3-30w.png`
+   followed by a plain regenerate. Meanwhile `screenshots-ready.json` builds
+   three verified slides that are safe to publish.
+3. **LinkedIn post** written and ready.
+4. **SMC charge limit** — the paid feature, and the reason this ships outside
+   the App Store. The Developer ID and notarisation pipeline needed for its
+   privileged helper are now in place.
