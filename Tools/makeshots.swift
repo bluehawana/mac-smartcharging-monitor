@@ -171,6 +171,81 @@ func place(_ shot: CGImage, in box: CGRect, size: CGSize,
     ctx.restoreGState()
 }
 
+
+// MARK: - Capture
+
+/// Grab a running app's window straight to a PNG.
+///
+/// This needs Screen Recording permission, which belongs to the *terminal*
+/// running the script rather than to the script itself. Without it macOS
+/// returns a desktop-only image with no windows, so we detect that and say
+/// so rather than writing a useless file.
+enum Capture {
+
+    /// Window IDs belonging to `appName`, largest first — the main window is
+    /// almost always the biggest one on screen.
+    static func windowIDs(forApp appName: String) -> [(id: CGWindowID, area: CGFloat, title: String)] {
+        let options: CGWindowListOption = [.optionOnScreenOnly, .excludeDesktopElements]
+        guard let list = CGWindowListCopyWindowInfo(options, kCGNullWindowID) as? [[String: Any]]
+        else { return [] }
+
+        var found: [(CGWindowID, CGFloat, String)] = []
+        for w in list {
+            guard let owner = w[kCGWindowOwnerName as String] as? String,
+                  owner.localizedCaseInsensitiveContains(appName),
+                  let id = w[kCGWindowNumber as String] as? CGWindowID,
+                  let bounds = w[kCGWindowBounds as String] as? [String: Any],
+                  let width = bounds["Width"] as? CGFloat,
+                  let height = bounds["Height"] as? CGFloat
+            else { continue }
+            // Skip menu bar items and other chrome.
+            if width < 200 || height < 150 { continue }
+            let title = (w[kCGWindowName as String] as? String) ?? ""
+            found.append((id, width * height, title))
+        }
+        return found.sorted { $0.1 > $1.1 }
+    }
+
+    @discardableResult
+    static func window(ofApp appName: String, to path: String) -> Bool {
+        let windows = windowIDs(forApp: appName)
+        guard let target = windows.first else {
+            let msg = """
+                no on-screen window found for "\(appName)".
+
+                Either the app is not running with a visible window, or this
+                terminal lacks Screen Recording permission — without it macOS
+                hides every window from the capture API.
+
+                Grant it in System Settings > Privacy & Security > Screen
+                Recording, add your terminal, then restart the terminal.
+
+                """
+            FileHandle.standardError.write(Data(msg.utf8))
+            return false
+        }
+
+        let proc = Process()
+        proc.executableURL = URL(fileURLWithPath: "/usr/sbin/screencapture")
+        // -l<id> a specific window, -o without shadow, -x silently.
+        proc.arguments = ["-l\(target.id)", "-o", "-x", path]
+        do { try proc.run() } catch {
+            FileHandle.standardError.write(Data("could not run screencapture\n".utf8))
+            return false
+        }
+        proc.waitUntilExit()
+
+        guard proc.terminationStatus == 0,
+              FileManager.default.fileExists(atPath: path) else {
+            FileHandle.standardError.write(Data("screencapture failed\n".utf8))
+            return false
+        }
+        let label = target.title.isEmpty ? "window \(target.id)" : "\"\(target.title)\""
+        print("captured \(label) -> \(path)")
+        return true
+    }
+}
+
 // MARK: - Compose
 
 func compose(_ slide: Slide, size: CGSize, config: ShotConfig) -> CGImage? {
@@ -348,6 +423,30 @@ func write(_ image: CGImage, to url: URL) {
 }
 
 // MARK: - Run
+
+// --capture <AppName> <out.png>: grab a live window instead of expecting one.
+if let i = CommandLine.arguments.firstIndex(of: "--capture") {
+    let args = CommandLine.arguments
+    guard i + 2 < args.count else {
+        FileHandle.standardError.write(Data(
+            "usage: --capture <AppName> <output.png>\n".utf8))
+        exit(1)
+    }
+    exit(Capture.window(ofApp: args[i + 1], to: args[i + 2]) ? 0 : 1)
+}
+
+if CommandLine.arguments.contains("--windows") {
+    let name = CommandLine.arguments.last ?? ""
+    let found = Capture.windowIDs(forApp: name)
+    if found.isEmpty {
+        print("no windows found for \"\(name)\" — is it running, and does this "
+            + "terminal have Screen Recording permission?")
+    }
+    for w in found {
+        print("  id \(w.id)  \(Int(w.area)) px²  \(w.title.isEmpty ? "(untitled)" : w.title)")
+    }
+    exit(0)
+}
 
 if CommandLine.arguments.contains("--layouts") {
     print("Layouts:\n")
