@@ -37,9 +37,9 @@ App-Specific Passwords.
 
 ```bash
 xcrun notarytool store-credentials "smartcharging-notary" \
-  --apple-id "you@example.com" \
-  --team-id "YOURTEAMID" \
-  --password "xxxx-xxxx-xxxx-xxxx"
+  --apple-id "YOUR_APPLE_ID" \
+  --team-id "YOUR_TEAM_ID" \
+  --password "YOUR_APP_SPECIFIC_PASSWORD"
 ```
 
 This saves the credential into your login keychain under the profile name
@@ -50,6 +50,16 @@ Your Team ID is the parenthesised code in the certificate name above, and is
 also on the [membership page](https://developer.apple.com/account).
 
 ---
+
+### Check both steps landed
+
+```bash
+make preflight
+```
+
+It names whichever piece is missing rather than failing part-way through a
+submission. The signing identity is read from your keychain, so nothing
+personal is written into the repo.
 
 ## Cutting a release
 
@@ -72,11 +82,17 @@ approval into the disk image so it validates even when the user is offline.
 
 Then upload `build/SmartCharging-<version>.dmg` to GitHub Releases.
 
-### If your identity is named differently
+### If you hold more than one Developer ID
+
+The first match in the keychain is used. Override it explicitly:
 
 ```bash
-make release DEV_ID="Developer ID Application: Hongzhi Li (ABCDE12345)"
+make release DEV_ID="Developer ID Application: Your Name (TEAMID)"
 ```
+
+Note that an **Apple Development** certificate carries a different identifier
+in its parentheses than your Team ID. Only the Developer ID certificate's
+parenthesised code is the Team ID, and that is the one notarisation checks.
 
 ---
 

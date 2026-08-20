@@ -3,12 +3,17 @@ BUNDLE   := build/$(APP).app
 CONFIG   := release
 BINARY   := .build/$(CONFIG)/$(APP)
 
-.PHONY: all build app run install clean icon sign dmg notarize release verify
+.PHONY: all build app run install clean icon preflight sign dmg notarize release verify
 
-# Distribution settings. Override on the command line if your identity or
-# notary profile is named differently:
+# Distribution settings.
+#
+# DEV_ID is discovered from the keychain rather than written down, so no
+# personal name or team id is committed to a public repo. Override it if you
+# hold more than one Developer ID:
 #   make release DEV_ID="Developer ID Application: Your Name (TEAMID)"
-DEV_ID         ?= Developer ID Application
+DEV_ID         ?= $(shell security find-identity -v -p codesigning 2>/dev/null | \
+                    grep "Developer ID Application" | head -1 | \
+                    sed -E 's/.*"(.*)".*/\1/')
 NOTARY_PROFILE ?= smartcharging-notary
 VERSION        ?= 1.0.0
 DMG            := build/$(APP)-$(VERSION).dmg
@@ -65,7 +70,25 @@ clean:
 
 # Re-sign the bundle for distribution. Hardened Runtime (--options runtime)
 # and a secure timestamp are both mandatory for notarisation.
-sign: app
+# Fail early and legibly rather than part-way through a notarisation.
+preflight:
+	@if [ -z '$(DEV_ID)' ]; then \
+		echo "error: no Developer ID Application certificate in your keychain."; \
+		echo "       An 'Apple Development' certificate cannot be notarised."; \
+		echo "       Xcode -> Settings -> Accounts -> Manage Certificates -> +"; \
+		echo "              -> Developer ID Application"; \
+		exit 1; \
+	fi
+	@echo "identity: $(DEV_ID)"
+	@if ! security find-generic-password -s 'com.apple.gke.notary.tool' \
+		-a '$(NOTARY_PROFILE)' >/dev/null 2>&1; then \
+		echo "error: no stored notary credential named '$(NOTARY_PROFILE)'."; \
+		echo "       See RELEASING.md step 2."; \
+		exit 1; \
+	fi
+	@echo "notary profile: $(NOTARY_PROFILE)"
+
+sign: preflight app
 	@echo "signing with: $(DEV_ID)"
 	@codesign --force --options runtime --timestamp \
 		--sign "$(DEV_ID)" $(BUNDLE)
