@@ -3,12 +3,20 @@ BUNDLE   := build/$(APP).app
 CONFIG   := release
 BINARY   := .build/$(CONFIG)/$(APP)
 
-.PHONY: all build app run install clean
+.PHONY: all build app run install clean icon
 
 all: app
 
 build:
 	swift build -c $(CONFIG)
+
+# Icon is generated from code rather than checked in as binary art, so a
+# palette change is a one-line edit rather than a redraw.
+icon:
+	@mkdir -p build docs/images
+	@swift Tools/makeicon.swift
+	@iconutil -c icns build/AppIcon.iconset -o Resources/AppIcon.icns
+	@echo "built Resources/AppIcon.icns"
 
 # Assemble a real .app bundle. A menu bar app needs one — NSStatusItem
 # and MenuBarExtra rely on bundle identity, so a bare executable misbehaves.
@@ -17,6 +25,7 @@ app: build
 	@mkdir -p $(BUNDLE)/Contents/MacOS $(BUNDLE)/Contents/Resources
 	@cp $(BINARY) $(BUNDLE)/Contents/MacOS/$(APP)
 	@cp Resources/Info.plist $(BUNDLE)/Contents/Info.plist
+	@cp Resources/AppIcon.icns $(BUNDLE)/Contents/Resources/AppIcon.icns
 	@printf 'APPL????' > $(BUNDLE)/Contents/PkgInfo
 	@codesign --force --deep --sign - $(BUNDLE) 2>/dev/null || \
 		echo "note: ad-hoc signing unavailable; the app still runs locally"

@@ -50,24 +50,28 @@ final class ChargerMemory {
               best.maxWatts >= s.advertisedMaxW + 15
         else { return nil }
 
-        let cableUnchanged = abs(best.maxMilliAmps - (s.advertisedProfiles.map(\.mA).max() ?? 0)) < 200
-        let railDropped = (s.advertisedProfiles.map(\.mV).max() ?? 0) < best.maxMilliVolts
+        let nowV = s.advertisedProfiles.map(\.mV).max() ?? 0
+        let nowA = s.advertisedProfiles.map(\.mA).max() ?? 0
 
-        if cableUnchanged && railDropped {
+        // Order matters. A cable cap lowers the current but never the offered
+        // voltage, so a dropped rail is the port no matter what the current
+        // did — and on a slow port the current drops too, which would
+        // otherwise read as a cable swap.
+        if nowV < best.maxMilliVolts - 1000 {
             return "This charger has offered \(best.maxWatts) W before, on a "
                  + "\(best.maxMilliVolts / 1000) V rail. Right now the best it offers is "
-                 + "\(s.advertisedMaxW) W. Your cable has not changed — the same current limit "
-                 + "is in place — so this is the port. Multi-port chargers usually put their "
+                 + "\(s.advertisedMaxW) W on \(nowV / 1000) V. A cable can only limit current, "
+                 + "never voltage — so this is the port. Multi-port chargers usually put their "
                  + "full power on one port only. Move back to the port you were using."
         }
-        if cableUnchanged {
+        if nowA < best.maxMilliAmps - 200 {
             return "This charger has offered \(best.maxWatts) W before and is offering "
-                 + "\(s.advertisedMaxW) W now, with the same cable. Check whether something "
-                 + "else is plugged into it, or try its other port."
+                 + "\(s.advertisedMaxW) W now. The rail is unchanged but the current ceiling "
+                 + "dropped to \(nowA) mA, which is the cable — a different one, or a loose "
+                 + "connection on the one you have."
         }
-        return "This charger has offered \(best.maxWatts) W before. It is offering "
-             + "\(s.advertisedMaxW) W now, and the cable's limit has changed too — so this is "
-             + "probably a different cable."
+        return "This charger has offered \(best.maxWatts) W before and is offering "
+             + "\(s.advertisedMaxW) W now. Check whether something else is plugged into it."
     }
 
     func forget() {

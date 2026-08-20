@@ -172,3 +172,113 @@ It also confirms the tightened rule works on real hardware in both directions:
 this reading correctly says **cable** (3000 mA on a full 20 V rail), while the
 30 W port reading correctly says **port** (12 V). Before the fix, both said
 "cable".
+
+---
+
+## 2026-08-20 (evening) — Systematic port/cable matrix, and three more bugs
+
+### Test process
+
+Ran every combination available on the desk, reading each with `--probe` and
+the dashboard. One variable changed at a time.
+
+**Cables tested** (all into UGREEN Nexode 200 W, port C1, the 140 W port):
+
+| Cable | Rail | Current | Delivered |
+|-------|-----:|--------:|----------:|
+| UGREEN 240 W PD 3.1 | 28 V | 4990 mA | **140 W** |
+| Apple M1-era USB-C | 20 V | 5000 mA | 100 W |
+| Cirafon generic | 20 V | 3000 mA | 60 W |
+
+Three cables, one port, three tiers. The Apple M1 cable is the instructive
+one: it is *properly e-marked* at a full 5 A, and still stops at 100 W,
+because it predates PD 3.1 and never offers the 28 V rail. "E-marked" is not
+binary — there are two tiers, 5 A/20 V (100 W) and 5 A/48 V EPR (240 W).
+
+**Ports tested** (UGREEN 240 W cable):
+
+| Charger port | Rail | Current | Delivered |
+|--------------|-----:|--------:|----------:|
+| C1 | 28 V | 4990 mA | 140 W |
+| C2 | 20 V | 4990 mA | 100 W |
+| C3 | 12 V | 2500 mA | 30 W |
+
+**Cable isolation.** The Cirafon cable was then tried in four combinations —
+UGREEN C1 and C2, into both the left and right Type-C ports on the Mac. 60 W
+every time. Change every port on both ends, no movement; swap only the cable,
+140 W. Both Mac-side ports behave identically, so the side you plug into does
+not matter — only the charger's port does.
+
+### Three bugs this exposed
+
+All three had the same root cause: **testing current without checking the
+rail.** A cable cap lowers current; a slow port lowers voltage *and* current.
+Anything that looks only at current blames the cable for a port fault.
+
+1. `cableCappedAt3A` returned true for the 30 W port (2500 mA). Now requires
+   ≥19 V as well.
+2. Two `--probe` annotations said "no e-marker" and "capped at 3 A by the
+   cable" on the 30 W port. Both now use the corrected helper, and a low rail
+   prints "this port never offers the full 20 V rail" instead.
+3. `ChargerMemory.downgrade` said "probably a different cable" when moving
+   C1→C3, because the current ceiling dropped along with the rail. Reordered
+   to check the rail first: a cable can only limit current, never voltage, so
+   a dropped rail is the port regardless of what the current did.
+
+### A misdiagnosis I made about my own fix
+
+I claimed the 21:02 screenshot validated the earlier port/cable fix. It did
+not — the 60 W case reads identically before and after, so that screenshot
+could not distinguish the two builds. What actually happened is the app under
+test had been launched at 20:55, four minutes *before* the 20:59 rebuild, so
+every screenshot up to 21:10 was from the stale binary. Verified by comparing
+process start time against binary mtime. Restarted, re-tested, and the 30 W
+case now correctly reports the port.
+
+Lesson: when verifying a fix from a screenshot, check that the screenshot came
+from a build containing the fix, and pick a test case whose output actually
+differs between the two versions.
+
+### Two honesty corrections in the copy
+
+- **65 W is genuinely ambiguous.** A multi-port charger splitting power and a
+  real single-port 65 W charger both negotiate 20 V / 3.25 A. The reading
+  cannot tell them apart. The copy previously asserted "your charger is
+  splitting power"; it now presents both and says which evidence separates
+  them. This matters more on older Macs, where 65 W third-party chargers are
+  common and there is no fault at all.
+- **`advertisedMaxW` under-reported under EPR.** PD 3.1's 28 V profiles are
+  negotiated outside `UsbHvcMenu`, so the probe printed "Best offer 99 W"
+  while delivering 140 W. Now floored at whatever is actually being delivered.
+
+### Older Mac support
+
+Reading the sensor on Intel and pre-USB-C machines needs different handling,
+now added:
+
+- **Charge percentage.** Apple silicon reports `CurrentCapacity` as a
+  percentage; Intel reports it in mAh. Detected by `MaxCapacity > 100` and
+  converted, with health derived from `DesignCapacity`. Without this, an Intel
+  Mac would have shown a "charge" of several thousand percent.
+- **Adapter voltage key.** Apple silicon uses `AdapterVoltage`, Intel uses
+  `Voltage`. Both are read now.
+- **No profile menu.** Intel and MagSafe 1/2 chargers report watts with no
+  `UsbHvcMenu` at all. Wattage is derived from volts × amps when missing, and
+  every cable rule is inert without a menu — so a MagSafe machine is never
+  told to buy a USB-C cable.
+- **Machines without a battery.** Mac mini, Studio, and Pro have no
+  `AppleSmartBattery`. Now says so plainly instead of reporting a read failure.
+
+**The real floor is macOS 14**, not the hardware. `MenuBarExtra` needs 13 and
+`@Observable` needs 14. That still covers Intel MacBooks from roughly 2018
+onward, since those run Sonoma. Dropping to 13 would mean replacing
+`@Observable` with `ObservableObject` across every view — worth doing only if
+people actually ask for it.
+
+### Icon
+
+Generated from code (`Tools/makeicon.swift`) rather than checked in as
+finished art, so a palette change is a one-line edit. A bolt inside a gauge
+arc that is deliberately *short* of full — the app is about the gap between
+what you should be getting and what you are. `make icon` regenerates the
+`.icns`.

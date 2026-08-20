@@ -41,15 +41,26 @@ struct PowerSnapshot: Equatable {
     var advertisedProfiles: [PDProfile] = []
 
     /// Best offer on the table, in watts.
+    ///
+    /// PD 3.1 EPR profiles (the 28 V rail) are negotiated outside UsbHvcMenu,
+    /// so the menu under-reports whenever EPR is in use. Never claim the
+    /// charger offers less than it is already delivering.
     var advertisedMaxW: Int {
-        advertisedProfiles.map(\.watts).max() ?? 0
+        max(advertisedProfiles.map(\.watts).max() ?? 0, adapterWatts)
     }
 
-    /// True when nothing on offer exceeds the 3 A limit that applies to
-    /// cables without an identifying chip.
+    /// True only for the genuine no-e-marker signature: the charger climbed
+    /// to its full 20 V rail and *still* could not exceed 3 A.
+    ///
+    /// The rail check is essential. A slow port also reports a low current,
+    /// but it lowers the voltage as well — so testing current alone blames
+    /// the cable for a port fault, which sends people out to buy a cable
+    /// that fixes nothing.
     var cableCappedAt3A: Bool {
         guard !advertisedProfiles.isEmpty else { return false }
-        return (advertisedProfiles.map(\.mA).max() ?? 0) <= 3000
+        let maxA = advertisedProfiles.map(\.mA).max() ?? 0
+        let maxV = advertisedProfiles.map(\.mV).max() ?? 0
+        return maxA <= 3000 && maxV >= 19000
     }
 
     var batteryPercent = 0
@@ -160,7 +171,8 @@ final class PowerMonitor {
 
     func refresh() {
         guard let props = Self.readBatteryProperties() else {
-            lastError = "Could not read AppleSmartBattery. This Mac may not have a battery."
+            lastError = "No battery found. Smart Charging reads a laptop's charging "
+                      + "sensor, so it has nothing to report on a Mac mini, Studio, or Pro."
             return
         }
         lastError = nil
@@ -169,11 +181,25 @@ final class PowerMonitor {
         s.timestamp = Date()
 
         s.adapterConnected = (props["ExternalConnected"] as? Bool) ?? false
-        s.batteryPercent   = Self.int(props["CurrentCapacity"]) ?? 0
         s.batteryVoltageMV = Self.int(props["Voltage"]) ?? 0
         s.isCharging       = (props["IsCharging"] as? Bool) ?? false
         s.cycleCount       = Self.int(props["CycleCount"]) ?? 0
-        s.healthPercent    = Self.int(props["MaxCapacity"]) ?? 0
+
+        // Apple silicon reports CurrentCapacity as a percentage and
+        // MaxCapacity as health. Intel reports both in mAh, so a MaxCapacity
+        // above 100 means we are on the mAh form and have to divide.
+        let rawCurrent = Self.int(props["CurrentCapacity"]) ?? 0
+        let rawMax     = Self.int(props["MaxCapacity"]) ?? 0
+
+        if rawMax > 100 {
+            s.batteryPercent = rawMax > 0 ? Int((Double(rawCurrent) / Double(rawMax) * 100).rounded()) : 0
+            // Health on Intel is max capacity against the design capacity.
+            let design = Self.int(props["DesignCapacity"]) ?? 0
+            s.healthPercent = design > 0 ? Int((Double(rawMax) / Double(design) * 100).rounded()) : 0
+        } else {
+            s.batteryPercent = rawCurrent
+            s.healthPercent  = rawMax
+        }
 
         if let raw = Self.int(props["Temperature"]) {
             s.temperatureC = Double(raw) / 100.0
@@ -186,10 +212,19 @@ final class PowerMonitor {
             ?? 0
 
         if let adapter = props["AdapterDetails"] as? [String: Any] {
-            s.adapterWatts       = Self.int(adapter["Watts"]) ?? 0
-            s.adapterVoltageMV   = Self.int(adapter["AdapterVoltage"]) ?? 0
-            s.adapterCurrentMA   = Self.int(adapter["Current"]) ?? 0
+            s.adapterWatts     = Self.int(adapter["Watts"]) ?? 0
+            s.adapterCurrentMA = Self.int(adapter["Current"]) ?? 0
+            // Apple silicon names this AdapterVoltage; Intel just says Voltage.
+            s.adapterVoltageMV = Self.int(adapter["AdapterVoltage"])
+                ?? Self.int(adapter["Voltage"]) ?? 0
             s.adapterDescription = adapter["Description"] as? String
+                ?? adapter["Name"] as? String
+
+            // Intel and MagSafe machines report watts without a profile menu.
+            // Derive the pair when it is missing so the wattage still shows.
+            if s.adapterWatts == 0, s.adapterVoltageMV > 0, s.adapterCurrentMA > 0 {
+                s.adapterWatts = (s.adapterVoltageMV * s.adapterCurrentMA) / 1_000_000
+            }
 
             if let menu = adapter["UsbHvcMenu"] as? [[String: Any]] {
                 s.advertisedProfiles = menu.compactMap { entry in

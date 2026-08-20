@@ -105,19 +105,23 @@ struct Diagnosis: Equatable {
             )
         }
 
-        // --- Charger is dividing its output ----------------------------
-        // 65 W / 3250 mA is the classic shared tier on multi-port units.
+        // --- 65 W: either a shared tier or a genuine 65 W charger --------
+        // These are indistinguishable from the reading alone — a multi-port
+        // unit splitting power and a real single-port 65 W charger both
+        // negotiate 20 V / 3.25 A. Say so rather than asserting a fault.
         if s.adapterWatts == 65 || s.adapterCurrentMA == 3250 {
             return Diagnosis(
                 level: draining ? .critical : .warning,
-                headline: "Charger is splitting its power",
-                detail: "You are getting \(s.adapterWatts) W, which is a shared tier rather than "
-                      + "a full one. Your charger believes something else is plugged into it and "
-                      + "has divided its output — this happens even when the other device is "
-                      + "fully charged and drawing nothing." + deficitNote,
-                fix: "Unplug everything else from the charger, then unplug the charger itself "
-                   + "from the wall for 15 seconds. Power-sharing can stay stuck until mains "
-                   + "power is removed.",
+                headline: "65 W — check whether it should be more",
+                detail: "65 W is two things at once: it is what a genuine 65 W charger "
+                      + "delivers, and it is also the tier a bigger multi-port charger drops to "
+                      + "when it thinks a second device is attached. If your charger is rated "
+                      + "higher than 65 W, it is the second one — and it happens even when the "
+                      + "other device is fully charged and drawing nothing." + deficitNote,
+                fix: "If the charger is rated above 65 W: unplug everything else from it, then "
+                   + "unplug it from the wall for 15 seconds — power-sharing can stay stuck "
+                   + "until mains power is removed. If it really is a 65 W charger, this is "
+                   + "simply its limit.",
                 evidence: evidence
             )
         }
