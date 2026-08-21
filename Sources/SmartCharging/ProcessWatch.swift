@@ -30,7 +30,14 @@ enum ProcessWatch {
 
     /// Top processes by CPU. Returns [] rather than throwing — this is a
     /// nice-to-have panel, never a reason to fail a reading.
+    ///
+    /// Unavailable in App Store builds. The sandbox blocks Process from
+    /// exec'ing /bin/ps, so rather than shipping a feature that silently
+    /// returns nothing, it is compiled out and the panel hides itself.
     static func topLoads(limit: Int = 4) -> [RunningLoad] {
+        #if APPSTORE
+        return []
+        #else
         guard let output = run("/bin/ps", ["-Aceo", "pid,pcpu,comm", "-r"]) else { return [] }
 
         var loads: [RunningLoad] = []
@@ -51,6 +58,7 @@ enum ProcessWatch {
             if loads.count >= limit { break }
         }
         return loads
+        #endif
     }
 
     private static func run(_ path: String, _ args: [String]) -> String? {

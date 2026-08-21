@@ -3,7 +3,7 @@ BUNDLE   := build/$(APP).app
 CONFIG   := release
 BINARY   := .build/$(CONFIG)/$(APP)
 
-.PHONY: all build app run install clean icon preflight sign dmg notarize release verify cask
+.PHONY: all build app run install clean icon preflight sign dmg notarize release verify cask appstore appstore-check
 
 # Distribution settings.
 #
@@ -163,3 +163,65 @@ cask:
 	@printf '  ]\nend\n' >> packaging/smartcharging.rb
 	@ruby -c packaging/smartcharging.rb >/dev/null && echo "regenerated packaging/smartcharging.rb for $(VERSION)"
 	@echo "copy it to your tap:  cp packaging/smartcharging.rb ../homebrew-tap/Casks/"
+
+
+# ---------------------------------------------------------------------------
+# Mac App Store build
+#
+# A different product from the direct build, deliberately:
+#   * sandboxed, which the store requires
+#   * process attribution compiled out, since the sandbox blocks /bin/ps
+#   * signed with Apple Distribution, not Developer ID
+#
+# Verified by experiment: a sandboxed build reads AppleSmartBattery correctly,
+# so the core function survives. Only ProcessWatch does not.
+# ---------------------------------------------------------------------------
+
+APPSTORE_ID  ?= $(shell security find-identity -v -p codesigning 2>/dev/null | \
+                  grep "Apple Distribution" | head -1 | sed -E 's/.*"(.*)".*/\1/')
+APPSTORE_APP := build/appstore/$(APP).app
+APPSTORE_PKG := build/$(APP)-$(VERSION).pkg
+
+appstore-check:
+	@if [ -z '$(APPSTORE_ID)' ]; then \
+		echo "error: no 'Apple Distribution' certificate in your keychain."; \
+		echo "       A 'Developer ID Application' certificate cannot be used"; \
+		echo "       for App Store submission — they are different types."; \
+		echo "       Xcode -> Settings -> Accounts -> Manage Certificates -> +"; \
+		echo "              -> Apple Distribution"; \
+		exit 1; \
+	fi
+	@echo "identity: $(APPSTORE_ID)"
+	@if [ ! -f Resources/embedded.provisionprofile ]; then \
+		echo "error: Resources/embedded.provisionprofile is missing."; \
+		echo "       Create a Mac App Store provisioning profile for"; \
+		echo "       com.bluehawana.smartcharging at developer.apple.com,"; \
+		echo "       download it, and save it to that path."; \
+		exit 1; \
+	fi
+	@echo "profile: present"
+
+appstore: appstore-check
+	@swift build -c $(CONFIG) -Xswiftc -DAPPSTORE
+	@rm -rf $(APPSTORE_APP)
+	@mkdir -p $(APPSTORE_APP)/Contents/MacOS $(APPSTORE_APP)/Contents/Resources
+	@cp $(BINARY) $(APPSTORE_APP)/Contents/MacOS/$(APP)
+	@cp Resources/Info.plist $(APPSTORE_APP)/Contents/Info.plist
+	@cp Resources/AppIcon.icns $(APPSTORE_APP)/Contents/Resources/AppIcon.icns
+	@cp Resources/embedded.provisionprofile $(APPSTORE_APP)/Contents/embedded.provisionprofile
+	@printf 'APPL????' > $(APPSTORE_APP)/Contents/PkgInfo
+	@codesign --force --options runtime --timestamp \
+		--entitlements Resources/SmartCharging.entitlements \
+		--sign "$(APPSTORE_ID)" $(APPSTORE_APP)
+	@codesign --verify --strict --verbose=2 $(APPSTORE_APP)
+	@echo "--- sandbox present? ---"
+	@codesign -d --entitlements - $(APPSTORE_APP) 2>&1 | grep -A1 app-sandbox || true
+	@productbuild --component $(APPSTORE_APP) /Applications \
+		--sign "3rd Party Mac Developer Installer: $$(echo '$(APPSTORE_ID)' | sed -E 's/Apple Distribution: //')" \
+		$(APPSTORE_PKG) 2>/dev/null || \
+		echo "note: installer signing needs a '3rd Party Mac Developer Installer' certificate"
+	@echo
+	@echo "built $(APPSTORE_APP)"
+	@echo "upload with: xcrun altool --upload-app -f $(APPSTORE_PKG) -t macos \\"
+	@echo "               --apple-id <app-store-connect-app-id> \\"
+	@echo "               --keychain-profile $(NOTARY_PROFILE)"

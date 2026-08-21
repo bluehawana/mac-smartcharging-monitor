@@ -23,5 +23,6 @@ xcuserdata/
 *.certSigningRequest
 *.mobileprovision
 *.provisionprofile
+Resources/embedded.provisionprofile
 AuthKey_*
 secrets/
