@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy Policy — Smart Charging</title>
+<meta name="description" content="Smart Charging collects no data. It reads a local hardware sensor, makes no network requests, and stores nothing off your Mac.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root {
+  --bg:#EDEFEE; --surface:#F8FAF9; --ink:#14181A; --muted:#5A6462;
+  --line:#C6CFCC; --accent:#0B6E7F;
+  --f-display:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --f-body:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
+  --f-mono:"IBM Plex Mono","SF Mono",Menlo,monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:#101413; --surface:#171D1B; --ink:#E6EBE9; --muted:#96A29F;
+    --line:#2E3836; --accent:#4FC3D9;
+  }
+}
+:root[data-theme="dark"] {
+  --bg:#101413; --surface:#171D1B; --ink:#E6EBE9; --muted:#96A29F;
+  --line:#2E3836; --accent:#4FC3D9;
+}
+* { box-sizing: border-box; }
+body {
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:var(--f-body); font-size:16px; line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap { max-width:720px; margin:0 auto; padding:0 24px; }
+header { padding:56px 0 34px; border-bottom:1px solid var(--line); }
+h1 { font-family:var(--f-display); font-weight:800; font-size:clamp(30px,5vw,44px);
+     letter-spacing:-0.02em; margin:0 0 12px; text-wrap:balance; }
+h2 { font-family:var(--f-display); font-weight:700; font-size:21px;
+     letter-spacing:-0.01em; margin:38px 0 10px; }
+p { margin:0 0 14px; }
+a { color:var(--accent); text-underline-offset:3px; }
+.eyebrow { font-family:var(--f-mono); font-size:10px; font-weight:600;
+  letter-spacing:0.2em; text-transform:uppercase; color:var(--accent);
+  display:block; margin-bottom:14px; }
+.lead { color:var(--muted); font-size:17px; }
+.panel { border:1px solid var(--line); background:var(--surface);
+  border-radius:3px; padding:20px 22px; margin:24px 0; }
+.panel p:last-child { margin-bottom:0; }
+ul { padding-left:20px; margin:0 0 14px; }
+li { margin-bottom:7px; }
+code { font-family:var(--f-mono); font-size:0.9em; }
+footer { margin-top:52px; padding:26px 0 60px; border-top:1px solid var(--line);
+  color:var(--muted); font-size:13.5px; }
+main { padding-bottom:10px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <span class="eyebrow">Smart Charging</span>
+    <h1>Privacy Policy</h1>
+    <p class="lead">Smart Charging collects no data of any kind.</p>
+  </div>
+</header>
+
+<main>
+<div class="wrap">
+
+  <div class="panel">
+    <p>
+      <strong>No data is collected, transmitted, or shared.</strong> The app has
+      no network capability, no accounts, no analytics and no third-party
+      components. Nothing you do in it reaches us or anyone else.
+    </p>
+  </div>
+
+  <h2>What the app reads</h2>
+  <p>
+    Smart Charging reads the <code>AppleSmartBattery</code> hardware sensor
+    present in every Mac laptop. That includes delivered wattage, the negotiated
+    voltage and current, battery charge level, temperature, cycle count and
+    health. It also lists processes using significant CPU, so a power deficit
+    can be attributed to what is causing it.
+  </p>
+  <p>
+    All of this is read locally, from your own machine, and displayed to you.
+  </p>
+
+  <h2>What is stored, and where</h2>
+  <p>
+    To report battery trends over time, the app keeps a local history of
+    readings in:
+  </p>
+  <p><code>~/Library/Application Support/SmartCharging/</code></p>
+  <p>
+    This file stays on your Mac. It is never uploaded. Deleting the app's
+    Application Support folder removes it permanently, and the Homebrew
+    <code>zap</code> command does so automatically.
+  </p>
+
+  <h2>What the app does not do</h2>
+  <ul>
+    <li>No network requests of any kind</li>
+    <li>No analytics, telemetry, crash reporting or usage measurement</li>
+    <li>No accounts, sign-in or identifiers</li>
+    <li>No advertising, and no advertising identifiers</li>
+    <li>No access to files, documents, contacts, location, camera or microphone</li>
+    <li>No data shared with third parties, because none is collected</li>
+  </ul>
+
+  <h2>Verifying this yourself</h2>
+  <p>
+    You do not have to take our word for it. The complete source is published
+    under the MIT licence at
+    <a href="https://github.com/bluehawana/mac-smartcharging-monitor">github.com/bluehawana/mac-smartcharging-monitor</a>,
+    and can be read or built yourself.
+  </p>
+  <p>
+    You can also confirm the behaviour directly: monitor the app in Activity
+    Monitor's Network tab, or point Little Snitch or LuLu at it. There is
+    nothing to see, because it never opens a connection.
+  </p>
+
+  <h2>Children</h2>
+  <p>
+    The app is a hardware utility that collects no data, so it presents no
+    particular risk to children and requires no age-related handling.
+  </p>
+
+  <h2>Changes</h2>
+  <p>
+    Should this policy ever change, the revision will be published on this page
+    and recorded in the project's public commit history.
+  </p>
+
+  <h2>Contact</h2>
+  <p>
+    Questions can be raised as an issue at
+    <a href="https://github.com/bluehawana/mac-smartcharging-monitor/issues">the project's issue tracker</a>.
+  </p>
+
+</div>
+</main>
+
+<footer>
+  <div class="wrap">
+    Last updated 21 August 2026 &middot;
+    <a href="./">Smart Charging</a>
+  </div>
+</footer>
+
+</body>
+</html>
