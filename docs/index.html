@@ -573,7 +573,7 @@ footer p { max-width: 72ch; }
     <div class="hero-grid">
       <div>
         <div class="kicker">Power delivery · Apple silicon</div>
-        <h1>Your charger is probably lying to you.</h1>
+        <h1>Know what your Mac is actually receiving.</h1>
         <p class="sub">
           A “100&nbsp;W” charger with the wrong cable delivers 60&nbsp;W. Your Mac
           won't tell you — the menu bar cheerfully says <em>Charging</em> while the
@@ -596,7 +596,7 @@ footer p { max-width: 72ch; }
 
         <p class="sub" style="font-size:14px;margin-top:14px">
           Free and open source. Signed and notarised by Apple, so it opens
-          without a Gatekeeper warning.
+          without a Gatekeeper warning. macOS 14 or later.
         </p>
       </div>
 
@@ -619,9 +619,9 @@ footer p { max-width: 72ch; }
     </div>
 
     <div class="hero-foot">
-      <span>60 W → 140 W</span>
-      <span>2.3× more power</span>
-      <span>Cost of fix: one cable</span>
+      <span>Reads the AppleSmartBattery sensor</span>
+      <span>No network · No elevated privileges</span>
+      <span>Open source · MIT</span>
     </div>
   </div>
 </header>
@@ -631,7 +631,7 @@ footer p { max-width: 72ch; }
   <div class="wrap">
     <div class="sec-head">
       <span class="eyebrow">The problem</span>
-      <h2>Running a local model turns a charging problem into a performance problem</h2>
+      <h2>Why sustained workloads expose an undersized charger</h2>
       <p>
         Ordinary work — mail, browsing, documents — draws so little power that almost any
         charger keeps up, and a weak one goes unnoticed for years. Local AI is different.
@@ -719,7 +719,7 @@ footer p { max-width: 72ch; }
   <div class="wrap">
     <div class="sec-head">
       <span class="eyebrow">Cables</span>
-      <h2>The cable sets a hard ceiling. Nothing gets past it.</h2>
+      <h2>The cable sets the current ceiling</h2>
       <p>
         Every USB-C cable carries a rating. Above 3&nbsp;amps a cable must contain a small
         chip — an <strong>e-marker</strong> — that tells the charger it can handle more. No chip,
@@ -732,7 +732,7 @@ footer p { max-width: 72ch; }
       <table>
         <thead>
           <tr>
-            <th>Cable</th><th>E-marker</th><th>Current</th><th>Voltage</th><th>Ceiling</th><th>How to spot it</th>
+            <th>Cable</th><th>E-marker</th><th>Current</th><th>Voltage</th><th>Cable rating</th><th>How to spot it</th>
           </tr>
         </thead>
         <tbody>
@@ -752,7 +752,7 @@ footer p { max-width: 72ch; }
             <td><strong>240 W e-marked</strong><span class="sub-td">USB-PD 3.1 EPR</span></td>
             <td class="n">Yes</td><td class="n">5 A</td><td class="n">48 V</td>
             <td class="n" style="color:var(--pass)">240 W</td>
-            <td>Printed “240W” or “EPR”. The only kind that can carry 140 W.</td>
+            <td>Printed “240W” or “EPR”. The only kind that can carry 140 W to a Mac.</td>
           </tr>
           <tr>
             <td><strong>Apple USB-C Charge Cable</strong><span class="sub-td">Ships with iPhone and small adapters</span></td>
@@ -761,7 +761,7 @@ footer p { max-width: 72ch; }
             <td>Thin white plastic. Looks identical to the good one at a glance — this catches people constantly.</td>
           </tr>
           <tr>
-            <td><strong>Apple 240 W Charge Cable</strong><span class="sub-td">Ships with 140 W MacBook Pro</span></td>
+            <td><strong>Apple 240 W Charge Cable</strong><span class="sub-td">Woven; ships with 140 W MacBook Pro</span></td>
             <td class="n">Yes</td><td class="n">5 A</td><td class="n">48 V</td>
             <td class="n" style="color:var(--pass)">240 W</td>
             <td>Thick, fabric-woven. If it's woven, it's the good one.</td>
@@ -776,8 +776,50 @@ footer p { max-width: 72ch; }
       </table>
     </div>
 
-    <div class="callout" style="margin-top:24px">
-      <span class="lab">The one that fools everyone</span>
+    <div class="callout" style="margin-top:24px;border-left-color:var(--accent)">
+      <span class="lab" style="color:var(--accent)">A rating is not a charging rate</span>
+      <p>
+        The right-hand column is what each <em>cable</em> is rated to carry, not
+        what a Mac will draw through it. <strong>No Mac charges at 240&nbsp;W.</strong>
+        Apple's highest charging rate is <strong>140&nbsp;W</strong>, on the 16-inch
+        MacBook&nbsp;Pro; most other models are lower.
+      </p>
+      <p>
+        240&nbsp;W is the ceiling defined by USB-PD 3.1, and cables rated for it —
+        including <a href="https://www.apple.com/shop/product/myqt3am/a/240w-usb-c-charge-cable-2-m">Apple's own 240&nbsp;W cable</a>
+        and UGREEN's equivalent — exist so the cable is never the constraint.
+        Buying one does not make your Mac charge faster than 140&nbsp;W; it removes
+        the cable as a reason you are not reaching it.
+      </p>
+    </div>
+
+    <h3 style="font-size:19px;margin:34px 0 6px">What each Mac will actually draw</h3>
+    <p style="color:var(--muted);font-size:14px;margin-bottom:14px">
+      Supplying more than a model's maximum is harmless — it simply is not used.
+      Supplying less is what causes throttling and battery drain under load.
+    </p>
+
+    <div class="tscroll">
+      <table>
+        <thead><tr><th>Model</th><th>Ships with</th><th>Maximum it will draw</th></tr></thead>
+        <tbody>
+          <tr><td><strong>MacBook Air 13″</strong></td><td class="n">30 W</td><td class="n">35 W</td></tr>
+          <tr><td><strong>MacBook Air 15″</strong></td><td class="n">35 W</td><td class="n">35 W</td></tr>
+          <tr><td><strong>MacBook Pro 14″</strong><span class="sub-td">base chip</span></td><td class="n">70 W</td><td class="n">96 W</td></tr>
+          <tr><td><strong>MacBook Pro 14″</strong><span class="sub-td">Pro / Max chip</span></td><td class="n">96 W</td><td class="n">96–140 W</td></tr>
+          <tr><td><strong>MacBook Pro 16″</strong></td><td class="n">140 W</td><td class="n" style="color:var(--pass)">140 W</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="note">
+      140 W is the highest rate any Mac accepts. Reaching it over USB-C requires
+      PD 3.1 at both ends — a charger that offers the 28 V rail and a cable rated
+      for it. MagSafe reaches the same 140 W and is unaffected by cable choice.
+    </p>
+
+    <div class="callout" style="margin-top:26px">
+      <span class="lab">Two Apple cables, one difference</span>
       <p>
         Apple's thin white USB-C cable and Apple's woven 240&nbsp;W cable are both genuine Apple
         cables, both e-marked, and both look like “the Apple cable.” One carries 60&nbsp;W, the
@@ -824,7 +866,7 @@ footer p { max-width: 72ch; }
   <div class="wrap">
     <div class="sec-head">
       <span class="eyebrow">Multi-port chargers</span>
-      <h2>“200 W” on the box is not 200 W for your Mac</h2>
+      <h2>Multi-port chargers divide their rated total</h2>
       <p>
         Multi-port chargers advertise their <em>total</em>. That total gets divided the moment
         a second device appears — and on many models it divides even when the second device is
@@ -866,7 +908,7 @@ footer p { max-width: 72ch; }
   <div class="wrap">
     <div class="sec-head">
       <span class="eyebrow">Measure it</span>
-      <h2>Two commands tell you the truth</h2>
+      <h2>Reading the figures yourself</h2>
       <p>
         Open Terminal (press ⌘&nbsp;Space, type <em>Terminal</em>, press Return), paste, press
         Return. Nothing here changes anything on your Mac — both commands only read.
@@ -963,7 +1005,7 @@ footer p { max-width: 72ch; }
   <div class="wrap">
     <div class="sec-head">
       <span class="eyebrow">What to buy</span>
-      <h2>In order of what actually fixes things</h2>
+      <h2>What to change, in order of effect</h2>
     </div>
 
     <div class="steps">
@@ -1018,32 +1060,32 @@ footer p { max-width: 72ch; }
   <div class="wrap">
     <div class="sec-head">
       <span class="eyebrow">The app</span>
-      <h2>Smart Charging puts these numbers in your menu bar</h2>
+      <h2>What Smart Charging does</h2>
       <p>
-        Everything on this page can be worked out by hand with
-        <code>ioreg</code>. Most people never will. Smart Charging reads the
-        same sensor continuously and says what the numbers mean in plain
-        language &mdash; which part of the chain is limiting you, and what to
-        do about it.
+        Everything on this page can be derived by hand with <code>ioreg</code>.
+        Doing it continuously, while you work, is what makes it useful. Smart
+        Charging reads the same sensor every few seconds and reports two things
+        that affect you directly: whether your Mac is being throttled by its
+        power supply, and what your current setup is doing to the battery.
       </p>
     </div>
 
     <div class="sym-grid">
       <div class="sym">
-        <h3>Live wattage in the menu bar</h3>
-        <p>What your charger is actually delivering, at a glance. Close the window and it keeps measuring from the top right.</p>
+        <h3>Sustained performance</h3>
+        <p>When the supply cannot meet demand, macOS throttles the chip to fit inside it. Seeing the deficit in watts tells you whether a slow model run is the model or the charger.</p>
       </div>
       <div class="sym">
-        <h3>Names the cause, not just the number</h3>
-        <p>60&nbsp;W and 65&nbsp;W are one watt apart and completely different problems. It tells you which one you have.</p>
+        <h3>Battery longevity</h3>
+        <p>An undersized supply forces continuous shallow charge and discharge while the chip runs hot. Heat and cycling are the two mechanisms that age lithium cells; both are tracked.</p>
       </div>
       <div class="sym">
-        <h3>Catches silent downgrades</h3>
-        <p>It remembers the best your charger has ever offered, so moving to a slower port does not go unnoticed.</p>
+        <h3>Identifies the limiting component</h3>
+        <p>A cable cap and a slow port produce similar wattage but need opposite fixes. Reading the voltage rail alongside the current separates them.</p>
       </div>
       <div class="sym">
-        <h3>Battery health over time</h3>
-        <p>Heat exposure, time spent full, and the charge cycling that a borderline supply causes.</p>
+        <h3>Detects change over time</h3>
+        <p>It records the best a charger has offered, so a drop after changing ports, adding a device, or a stuck negotiation is reported rather than absorbed.</p>
       </div>
     </div>
 
@@ -1066,7 +1108,7 @@ footer p { max-width: 72ch; }
   <div class="wrap">
     <div class="sec-head">
       <span class="eyebrow">Also open source</span>
-      <h2>Publishing a Mac app? The screenshots are the other hard part.</h2>
+      <h2>A related tool: Mac App Store screenshots</h2>
       <p>
         Building Smart Charging turned up a second problem. Every App Store
         screenshot generator targets iPhone, iPad and Android. The Mac App
