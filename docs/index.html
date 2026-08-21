@@ -288,6 +288,32 @@ a { color: var(--accent); text-underline-offset: 3px; }
 
 
 /* ============================================================
+   DEMO SCENARIOS
+   ============================================================ */
+.scenarios {
+  display: flex; flex-wrap: wrap; gap: 9px; margin-bottom: 18px;
+}
+.scen {
+  display: inline-flex; align-items: baseline; gap: 8px;
+  padding: 10px 15px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  border-radius: 3px;
+  font-family: var(--f-body);
+  font-size: 13.5px;
+  color: var(--ink);
+  cursor: pointer;
+  transition: border-color .13s, background .13s;
+}
+.scen:hover { border-color: var(--accent); }
+.scen[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-wash); }
+.scen b {
+  font-family: var(--f-mono); font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.scen .dotm { width: 8px; height: 8px; border-radius: 50%; align-self: center; }
+
+/* ============================================================
    ANALYSER
    ============================================================ */
 .analyser {
@@ -1179,15 +1205,26 @@ footer p { max-width: 72ch; }
 <section class="sec" id="try">
   <div class="wrap">
     <div class="sec-head">
-      <span class="eyebrow">Run the analysis</span>
-      <h2>Check your own machine without installing anything</h2>
+      <span class="eyebrow">Try it here</span>
+      <h2>Run the analysis in your browser</h2>
       <p>
-        The app applies a set of rules to figures macOS already exposes. Those
-        same rules run below, in this page. Paste the output of one read-only
-        command and you get the identical diagnosis — the limiting component
-        named, not just a wattage.
+        The engine below is the same set of rules the app applies, ported to
+        JavaScript and running in this page. Select a reading measured on real
+        hardware to see how it responds, or paste your own machine's figures
+        underneath. Nothing is uploaded either way.
       </p>
     </div>
+
+    <div class="scenarios" id="scenarios"></div>
+
+    <div class="analyser" style="margin-bottom:30px">
+      <div id="result"></div>
+    </div>
+
+    <h3 style="font-size:19px;margin:34px 0 6px">Now check your own Mac</h3>
+    <p style="color:var(--muted);font-size:14px;margin-bottom:14px">
+      One read-only command. It changes nothing and needs no administrator rights.
+    </p>
 
     <div class="code">
       <div class="code-bar">
@@ -1213,7 +1250,6 @@ footer p { max-width: 72ch; }
           </span>
         </div>
       </div>
-      <div id="result"></div>
     </div>
 
     <p class="note">
@@ -1853,7 +1889,55 @@ swift makeshots.swift --layouts</pre>
           : '') +
       '</div>';
     resultEl.classList.add("on");
-    resultEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
+
+  /* ---------- one-click demo scenarios ----------
+     Every reading below was measured on a 16-inch MacBook Pro (M-series Max)
+     with Smart Charging. They are presented as samples, not as the visitor's
+     own machine — a browser has no access to battery sensors. */
+  var SCENARIOS = [
+    { label: "Full rate",       w: "140 W", tint: "var(--pass)", data:
+      '"ExternalConnected" = Yes\n"Watts"=140\n"AdapterVoltage"=28000\n"Current"=4990\n' +
+      '"CurrentCapacity" = 80\n"Voltage" = 12360\n"InstantAmperage" = 0\n' +
+      '"MaxCurrent"=4990\n"MaxVoltage"=20000' },
+
+    { label: "Standard USB-PD", w: "100 W", tint: "var(--warn)", data:
+      '"ExternalConnected" = Yes\n"Watts"=100\n"AdapterVoltage"=20000\n"Current"=4990\n' +
+      '"CurrentCapacity" = 80\n"Voltage" = 11675\n"InstantAmperage" = 18446744073709549871\n' +
+      '"MaxCurrent"=4990\n"MaxVoltage"=20000' },
+
+    { label: "Cable-limited",   w: "60 W",  tint: "var(--fail)", data:
+      '"ExternalConnected" = Yes\n"Watts"=60\n"AdapterVoltage"=20000\n"Current"=3000\n' +
+      '"CurrentCapacity" = 80\n"Voltage" = 11533\n"InstantAmperage" = 18446744073709550905\n' +
+      '"MaxCurrent"=3000\n"MaxVoltage"=20000' },
+
+    { label: "Low-power port",  w: "30 W",  tint: "var(--fail)", data:
+      '"ExternalConnected" = Yes\n"Watts"=30\n"AdapterVoltage"=12000\n"Current"=2500\n' +
+      '"CurrentCapacity" = 70\n"Voltage" = 11600\n"InstantAmperage" = 18446744073709551194\n' +
+      '"MaxCurrent"=2500\n"MaxVoltage"=12000' }
+  ];
+
+  var scenEl = document.getElementById("scenarios");
+  if (scenEl) {
+    SCENARIOS.forEach(function (sc, i) {
+      var b = document.createElement("button");
+      b.className = "scen";
+      b.type = "button";
+      b.setAttribute("aria-pressed", i === 0 ? "true" : "false");
+      b.innerHTML = '<span class="dotm" style="background:' + sc.tint + '"></span>' +
+                    '<span>' + sc.label + '</span><b>' + sc.w + '</b>';
+      b.addEventListener("click", function () {
+        scenEl.querySelectorAll(".scen").forEach(function (o) {
+          o.setAttribute("aria-pressed", "false");
+        });
+        b.setAttribute("aria-pressed", "true");
+        render(parse(sc.data));
+      });
+      scenEl.appendChild(b);
+    });
+    // Show one immediately so the section is never empty on arrival.
+    render(parse(SCENARIOS[0].data));
   }
 
   runEl.addEventListener("click", function () {
@@ -1873,6 +1957,7 @@ swift makeshots.swift --layouts</pre>
       return;
     }
     render(parsed);
+    resultEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
   });
 
   clearEl.addEventListener("click", function () {
