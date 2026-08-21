@@ -6,9 +6,18 @@
 	<key>com.apple.security.app-sandbox</key>
 	<true/>
 
-	<!-- Nothing else is requested. The app reads the AppleSmartBattery
-	     IOService, which the sandbox permits, and does not open files,
-	     use the network, or access the camera, microphone or contacts.
-	     Verified: a sandboxed build returns full sensor readings. -->
+	<!-- Must be signed into the bundle, not only present in the provisioning
+	     profile. Without these the upload is rejected with error 90886:
+	     "missing an application identifier but has an application identifier
+	     in the provisioning profile". They have to match the profile exactly. -->
+	<key>com.apple.application-identifier</key>
+	<string>B5627M73YT.com.bluehawana.smartcharging</string>
+
+	<key>com.apple.developer.team-identifier</key>
+	<string>B5627M73YT</string>
+
+	<!-- Nothing further is requested. The app reads the AppleSmartBattery
+	     IOService, which the sandbox permits, and does not open files, use
+	     the network, or access camera, microphone or contacts. -->
 </dict>
 </plist>
