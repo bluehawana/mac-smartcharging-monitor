@@ -210,6 +210,11 @@ appstore: appstore-check
 	@cp Resources/AppIcon.icns $(APPSTORE_APP)/Contents/Resources/AppIcon.icns
 	@cp Resources/embedded.provisionprofile $(APPSTORE_APP)/Contents/embedded.provisionprofile
 	@printf 'APPL????' > $(APPSTORE_APP)/Contents/PkgInfo
+	@# Files downloaded through a browser carry com.apple.quarantine, and it
+	@# travels into the bundle when copied. Apple rejects any App Store package
+	@# containing it (error 91109), naming embedded.provisionprofile most often
+	@# since that is the one file that always arrives via download.
+	@xattr -cr $(APPSTORE_APP)
 	@codesign --force --options runtime --timestamp \
 		--entitlements Resources/SmartCharging.entitlements \
 		--sign "$(APPSTORE_ID)" $(APPSTORE_APP)
