@@ -903,6 +903,126 @@ footer p { max-width: 72ch; }
   </div>
 </section>
 
+<!-- ============ GENERATION COMPARISON ============ -->
+<section class="sec">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Four years apart</span>
+      <h2>Why a newer charger of the same size delivers more</h2>
+      <p>
+        Two UGREEN GaN chargers, 2022 and 2026, photographed together. They are
+        close to the same size and shape. The rated totals differ — 100&nbsp;W
+        against 200&nbsp;W — but the total is not the number that matters to a
+        laptop. The rails on offer are.
+      </p>
+    </div>
+
+    <img src="images/ugreen-size-compare.jpg" alt="A 200 W and a 100 W UGREEN GaN charger side by side, nearly identical in size"
+         style="width:100%;max-width:420px;border-radius:4px;border:1px solid var(--line);display:block;margin-bottom:26px">
+
+    <div class="tscroll">
+      <table>
+        <thead>
+          <tr><th>Per port</th><th>2022 · CD226 · 100 W</th><th>2026 · X764 · 200 W</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Primary USB-C</strong></td>
+            <td class="n">100 W<span class="sub-td">20 V / 5 A</span></td>
+            <td class="n" style="color:var(--pass)">140 W<span class="sub-td">28 V / 5 A</span></td>
+          </tr>
+          <tr>
+            <td><strong>Second USB-C</strong></td>
+            <td class="n">100 W<span class="sub-td">shared with the first</span></td>
+            <td class="n">100 W<span class="sub-td">20 V / 5 A</span></td>
+          </tr>
+          <tr>
+            <td><strong>Third USB-C</strong></td>
+            <td class="n">22.5 W</td>
+            <td class="n">30 W</td>
+          </tr>
+          <tr>
+            <td><strong>USB-A</strong></td>
+            <td class="n">22.5 W</td>
+            <td class="n">22.5 W</td>
+          </tr>
+          <tr>
+            <td><strong>Highest voltage rail</strong></td>
+            <td class="n" style="color:var(--fail)">20 V</td>
+            <td class="n" style="color:var(--pass)">28 V</td>
+          </tr>
+          <tr>
+            <td><strong>Standard</strong></td>
+            <td>USB-PD 3.0</td>
+            <td>USB-PD 3.1 (EPR)</td>
+          </tr>
+          <tr>
+            <td><strong>Combined output</strong></td>
+            <td class="n">100 W</td>
+            <td class="n">200 W</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout" style="margin-top:24px;border-left-color:var(--accent)">
+      <span class="lab" style="color:var(--accent)">The row that decides it</span>
+      <p>
+        <strong>The 2022 unit has no 28&nbsp;V rail.</strong> Its highest tier is
+        20&nbsp;V, and 20&nbsp;V × 5&nbsp;A is 100&nbsp;W. That is a hard ceiling
+        set by the hardware: no cable, no port, and no firmware update can take a
+        MacBook&nbsp;Pro to 140&nbsp;W through it.
+      </p>
+      <p>
+        140&nbsp;W requires 28&nbsp;V, which arrived with USB-PD 3.1. A charger
+        either offers that rail or it does not. This is why “100&nbsp;W versus
+        200&nbsp;W” understates the difference — the useful comparison is 100&nbsp;W
+        versus 140&nbsp;W <em>to a single laptop</em>, and it is a generational
+        change rather than a bigger version of the same thing.
+      </p>
+    </div>
+
+    <h3 style="font-size:19px;margin:34px 0 12px">Printed specification against measured output</h3>
+    <p style="color:var(--muted);font-size:14px;margin-bottom:16px">
+      Both units were measured with Smart Charging. Every figure matched the
+      label, which is the point: the information is accurate and public, printed
+      on the underside of the charger — it is simply never surfaced while you
+      are using the machine.
+    </p>
+
+    <div class="tscroll">
+      <table>
+        <thead><tr><th>Charger</th><th>Port</th><th>Label states</th><th>Measured</th></tr></thead>
+        <tbody>
+          <tr><td>2026 · 200 W</td><td>C1</td><td class="n">28.0 V / 5.0 A · 140 W</td><td class="n" style="color:var(--pass)">140 W @ 28 V</td></tr>
+          <tr><td>2026 · 200 W</td><td>C2</td><td class="n">20.0 V / 5.0 A · 100 W</td><td class="n" style="color:var(--pass)">100 W @ 20 V</td></tr>
+          <tr><td>2026 · 200 W</td><td>C3</td><td class="n">12.0 V / 2.5 A · 30 W</td><td class="n" style="color:var(--pass)">30 W @ 12 V</td></tr>
+          <tr><td>2022 · 100 W</td><td>C1</td><td class="n">20.0 V / 5.0 A · 100 W</td><td class="n" style="color:var(--pass)">99 W @ 20 V</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="sym-grid" style="margin-top:26px">
+      <div class="sym">
+        <h3>2026 · X764 · 200 W</h3>
+        <img src="images/ugreen-200w-label.jpg" alt="Specification label of the 200 W UGREEN charger"
+             style="width:100%;border-radius:3px;border:1px solid var(--line);margin-top:6px">
+      </div>
+      <div class="sym">
+        <h3>2022 · CD226 · 100 W</h3>
+        <img src="images/ugreen-100w-label.jpg" alt="Specification label of the 100 W UGREEN charger"
+             style="width:100%;border-radius:3px;border:1px solid var(--line);margin-top:6px">
+      </div>
+    </div>
+
+    <p class="note">
+      Before replacing a charger, read its underside. If the highest listed
+      voltage is 20&nbsp;V, 100&nbsp;W is its limit for a laptop no matter what
+      the total says.
+    </p>
+  </div>
+</section>
+
 <!-- ============ DIAGNOSE ============ -->
 <section class="sec">
   <div class="wrap">
