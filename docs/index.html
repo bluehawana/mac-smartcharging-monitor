@@ -286,6 +286,80 @@ a { color: var(--accent); text-underline-offset: 3px; }
 }
 .brewline b { color: #4FC3D9; font-weight: 400; }
 
+
+/* ============================================================
+   ANALYSER
+   ============================================================ */
+.analyser {
+  border: 1px solid var(--line);
+  background: var(--surface);
+  border-radius: var(--r);
+  overflow: hidden;
+}
+.analyser-body { padding: 18px; display: flex; flex-direction: column; gap: 12px; }
+
+#paste {
+  width: 100%;
+  min-height: 120px;
+  resize: vertical;
+  background: var(--bg);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  padding: 12px 14px;
+  font-family: var(--f-mono);
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+#paste::placeholder { color: var(--muted); }
+
+.analyser-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+
+.btn-run {
+  background: var(--accent);
+  color: var(--accent-ink);
+  border: 0;
+  padding: 11px 20px;
+  border-radius: 3px;
+  font-family: var(--f-body);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn-run:hover { filter: brightness(1.1); }
+.btn-clear {
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  padding: 11px 16px;
+  border-radius: 3px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+#result { display: none; border-top: 1px solid var(--line); }
+#result.on { display: block; }
+
+.res-head {
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--line-soft);
+  background: var(--surface-2);
+}
+.res-figs {
+  display: flex; flex-wrap: wrap; gap: 26px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--line-soft);
+}
+.res-verdict { padding: 18px 20px; display: flex; flex-direction: column; gap: 10px; }
+.res-fix {
+  padding: 13px 15px; border-radius: 3px;
+  font-size: 14px;
+}
+.privacy-note {
+  font-size: 12.5px; color: var(--muted);
+  display: flex; align-items: center; gap: 7px;
+}
+
 /* ============================================================
    SECTIONS
    ============================================================ */
@@ -586,9 +660,8 @@ footer p { max-width: 72ch; }
              href="https://github.com/bluehawana/mac-smartcharging-monitor/releases">
             Download for macOS
           </a>
-          <a class="btn btn-ghost"
-             href="https://github.com/bluehawana/mac-smartcharging-monitor">
-            Source on GitHub
+          <a class="btn btn-ghost" href="#try">
+            Check my Mac in the browser
           </a>
         </div>
 
@@ -1019,6 +1092,133 @@ footer p { max-width: 72ch; }
       Before replacing a charger, read its underside. If the highest listed
       voltage is 20&nbsp;V, 100&nbsp;W is its limit for a laptop no matter what
       the total says.
+    </p>
+  </div>
+</section>
+
+<!-- ============ ONE CHARGER ============ -->
+<section class="sec">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Hybrid and travel setups</span>
+      <h2>One charger for a MacBook Pro and a mobile workstation</h2>
+      <p>
+        The case for a 200&nbsp;W four-port charger is not that any single
+        machine needs 200&nbsp;W. It is that one device can replace two
+        manufacturer power supplies with different connectors, different
+        voltages and very different weights.
+      </p>
+    </div>
+
+    <div class="tscroll">
+      <table>
+        <thead>
+          <tr><th>Machine</th><th>Supplied adapter</th><th>Accepts over USB-C</th><th>From the 200 W charger</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>MacBook Pro 16″</strong><span class="sub-td">M-series Max</span></td>
+            <td class="n">140 W · USB-C</td>
+            <td class="n">140 W</td>
+            <td class="n" style="color:var(--pass)">140 W on C1</td>
+          </tr>
+          <tr>
+            <td><strong>Dell Precision 7680</strong><span class="sub-td">16″ mobile workstation</span></td>
+            <td class="n">240 W · 7.4 mm barrel</td>
+            <td class="n">130 W</td>
+            <td class="n" style="color:var(--pass)">130 W on C1</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="note">
+      Dell documents 130&nbsp;W input on the Precision 7680's Thunderbolt&nbsp;4
+      ports, alongside the 240&nbsp;W barrel adapter it ships with. USB-C is a
+      supported second path, not a workaround.
+    </p>
+
+    <div class="sym-grid" style="margin-top:26px">
+      <div class="sym">
+        <h3>What you carry instead</h3>
+        <p>A 240 W workstation brick weighs roughly 1.5&nbsp;kg. Add a second adapter for the Mac and the power supplies alone approach the weight of a laptop. A single GaN charger replaces both and fits in a hand.</p>
+      </div>
+      <div class="sym">
+        <h3>One mains outlet</h3>
+        <p>Hotel desks, trains and shared workspaces rarely offer two free sockets. Four ports from one plug also charges a phone and a headset without a second adapter.</p>
+      </div>
+      <div class="sym">
+        <h3>No ecosystem lock-in</h3>
+        <p>The same charger serves macOS and Windows hardware because USB-PD is a standard, not a vendor feature. Only the cable rating and the port you choose determine what each machine receives.</p>
+      </div>
+      <div class="sym">
+        <h3>Where the compromise sits</h3>
+        <p>Both machines at once share the 200 W total, so each settles near 100 W rather than its maximum. Full rate is available to whichever is on the primary port.</p>
+      </div>
+    </div>
+
+    <div class="callout" style="margin-top:26px">
+      <span class="lab">Worth knowing before you rely on it</span>
+      <p>
+        130&nbsp;W is below the 240&nbsp;W the Precision ships with. For document
+        work, builds and virtual machines that is comfortable. Under sustained
+        CPU and discrete-GPU load the machine will draw more than USB-C can
+        supply and make up the difference from its battery — the same deficit
+        this site describes for a Mac, on different hardware.
+      </p>
+      <p>
+        The practical arrangement is the barrel adapter at a fixed desk, and the
+        200&nbsp;W charger for travel, where carrying one supply instead of two
+        matters more than peak throughput.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ANALYSER ============ -->
+<section class="sec" id="try">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Run the analysis</span>
+      <h2>Check your own machine without installing anything</h2>
+      <p>
+        The app applies a set of rules to figures macOS already exposes. Those
+        same rules run below, in this page. Paste the output of one read-only
+        command and you get the identical diagnosis — the limiting component
+        named, not just a wattage.
+      </p>
+    </div>
+
+    <div class="code">
+      <div class="code-bar">
+        <span class="lab">Step 1 · run this in Terminal</span>
+        <button class="copy" data-code="anacmd">Copy</button>
+      </div>
+      <pre id="anacmd">ioreg -rn AppleSmartBattery | tr ',' '\n' | grep -E '"(Watts|AdapterVoltage|Current|CurrentCapacity|Voltage|InstantAmperage|IsCharging|Temperature|MaxCapacity|CycleCount|MaxVoltage|MaxCurrent|ExternalConnected)"'</pre>
+    </div>
+
+    <p class="note" style="margin-bottom:14px">
+      Step 2 &middot; paste everything it printed here.
+    </p>
+
+    <div class="analyser">
+      <div class="analyser-body">
+        <textarea id="paste" spellcheck="false"
+          placeholder='"ExternalConnected" = Yes&#10;"Watts"=140&#10;"AdapterVoltage"=28000&#10;"Current"=4990&#10;...'></textarea>
+        <div class="analyser-actions">
+          <button class="btn-run" id="run">Analyse</button>
+          <button class="btn-clear" id="clear">Clear</button>
+          <span class="privacy-note">
+            Runs entirely in your browser. Nothing is uploaded or stored.
+          </span>
+        </div>
+      </div>
+      <div id="result"></div>
+    </div>
+
+    <p class="note">
+      The command only reads sensor values. It changes nothing, needs no
+      administrator rights, and works on any Mac with a battery.
     </p>
   </div>
 </section>
@@ -1483,6 +1683,205 @@ swift makeshots.swift --layouts</pre>
     sel.addRange(r);
   }
 })();
+
+/* ============================================================
+   In-browser analyser.
+
+   Mirrors Sources/SmartCharging/Diagnosis.swift. Both read the same
+   sensor values and apply the same rules, so this page and the app
+   reach the same conclusion from the same input. Runs locally —
+   the pasted text never leaves the browser.
+   ============================================================ */
+(function () {
+  "use strict";
+
+  var pasteEl  = document.getElementById("paste");
+  var runEl    = document.getElementById("run");
+  var clearEl  = document.getElementById("clear");
+  var resultEl = document.getElementById("result");
+  if (!pasteEl || !runEl || !resultEl) return;
+
+  /* ---------- parse ---------- */
+  function parse(text) {
+    var out = { profiles: [] };
+    var currents = [], voltages = [];
+
+    text.split(/\r?\n/).forEach(function (line) {
+      var m = line.match(/"([A-Za-z]+)"\s*=\s*(.+?)\s*$/);
+      if (!m) return;
+      var key = m[1], raw = m[2].trim().replace(/[,}]+$/, "");
+
+      if (key === "MaxCurrent") { currents.push(parseInt(raw, 10)); return; }
+      if (key === "MaxVoltage") { voltages.push(parseInt(raw, 10)); return; }
+
+      if (raw === "Yes" || raw === "No") { out[key] = (raw === "Yes"); return; }
+
+      // Amperage arrives as a 64-bit value that exceeds Number.MAX_SAFE_INTEGER,
+      // so keep the digits and convert with BigInt later. parseInt would round
+      // it and the sign flip would then produce a wrong, often positive, result.
+      if (key === "InstantAmperage" || key === "Amperage") {
+        if (out.__ampRaw === undefined && /^-?\d+$/.test(raw)) out.__ampRaw = raw;
+        return;
+      }
+
+      var n = parseInt(raw, 10);
+      if (!isNaN(n) && out[key] === undefined) out[key] = n;
+    });
+
+    // UsbHvcMenu lists MaxCurrent then MaxVoltage per entry, so they pair up.
+    var pairs = Math.min(currents.length, voltages.length);
+    for (var i = 0; i < pairs; i++) {
+      out.profiles.push({ mA: currents[i], mV: voltages[i] });
+    }
+    return out;
+  }
+
+  /* InstantAmperage is a 64-bit two's-complement value, so a discharging
+     battery arrives as roughly 1.8e19 unless it is reinterpreted. The
+     magnitude exceeds Number.MAX_SAFE_INTEGER, so the conversion is done in
+     BigInt and only the small signed result becomes a Number. */
+  function signed(raw) {
+    if (raw === undefined || raw === null) return 0;
+    try {
+      var b = BigInt(raw);
+      if (b > 9223372036854775807n) b -= 18446744073709551616n;
+      return Number(b);
+    } catch (e) {
+      var n = parseInt(raw, 10);
+      return isNaN(n) ? 0 : n;
+    }
+  }
+
+  /* ---------- diagnose ---------- */
+  function diagnose(d) {
+    var connected = d.ExternalConnected === true || (d.Watts || 0) > 0;
+    var watts = d.Watts || 0;
+    var railMV = d.AdapterVoltage || 0;
+    var cableMA = d.Current || 0;
+    var pct = d.CurrentCapacity || 0;
+    var battMV = d.Voltage || 0;
+    var amps = signed(d.__ampRaw);
+    var flowW = (battMV / 1000) * (amps / 1000);
+    var draining = amps < -20;
+
+    var maxA = 0, maxV = 0;
+    d.profiles.forEach(function (p) {
+      if (p.mA > maxA) maxA = p.mA;
+      if (p.mV > maxV) maxV = p.mV;
+    });
+    var cableCapped = d.profiles.length > 0 && maxA <= 3000 && maxV >= 19000;
+
+    if (!connected) {
+      return { level: "info", head: "No charger attached",
+        body: "Nothing to diagnose without an adapter connected. Plug in and run the command again to see what your cable and charger actually deliver.",
+        fix: "", figs: [["Charge", pct, "%"]] };
+    }
+
+    var figs = [
+      ["Delivered", watts, "W"],
+      ["Rail", Math.round(railMV / 1000), "V"],
+      ["Cable ceiling", cableMA, "mA"],
+      ["Charge", pct, "%"]
+    ];
+    if (battMV) figs.splice(3, 0, ["Battery flow", (flowW >= 0 ? "+" : "") + flowW.toFixed(1), "W"]);
+
+    var deficit = draining
+      ? " Your Mac is currently drawing more than the adapter supplies, so the battery is discharging while plugged in."
+      : "";
+
+    if (watts > 0 && watts <= 35) {
+      return { level: draining ? "bad" : "warn",
+        head: "Only " + watts + " W is reaching your Mac",
+        body: "That is far below what a laptop requires. On a multi-port charger this is the low-power port, intended for a phone. It can also indicate a hub or display passing limited power through." + deficit,
+        fix: "Move to the charger's primary port and connect the charger directly to mains.", figs: figs };
+    }
+    if (cableCapped && railMV >= 19000 && watts <= 60) {
+      return { level: draining ? "bad" : "warn",
+        head: "The cable is limiting you to " + watts + " W",
+        body: "The charger reached its full 20 V rail, but no profile exceeds 3 A. Above 3 A a USB-C cable must carry an e-marker chip identifying itself; without one the standard requires the charger to stop there. 20 V x 3 A is 60 W." + deficit,
+        fix: "Replace the cable with one rated 240 W (PD 3.1). It is the least expensive component in the chain and the most frequent cause.", figs: figs };
+    }
+    if (watts === 65 || cableMA === 3250) {
+      return { level: draining ? "bad" : "warn",
+        head: "65 W — verify whether it should be higher",
+        body: "65 W is ambiguous from the reading alone: it is what a genuine 65 W charger delivers, and also the tier a larger multi-port charger drops to when it detects a second device. If your charger is rated above 65 W, it is dividing its output." + deficit,
+        fix: "Disconnect everything else from the charger, then disconnect it from mains for 15 seconds. Power sharing can persist until mains power is removed.", figs: figs };
+    }
+    if (railMV >= 27000 && watts >= 140) {
+      return { level: draining ? "warn" : "good",
+        head: "Full rate — " + watts + " W",
+        body: "You are on the 28 V rail, which exists only under USB-PD 3.1. Charger and cable are both operating at their maximum, and this is the highest rate any Mac accepts." + (draining ? " Your Mac is still drawing more than this under load, which is close to the physical limit of a single USB-C connection." : ""),
+        fix: "", figs: figs };
+    }
+    if (watts >= 96) {
+      return { level: draining ? "warn" : "good",
+        head: watts + " W — standard USB-PD maximum",
+        body: "Cable and charger are operating correctly at the conventional USB-C limit." + (draining ? " Under sustained load — a local model, for instance — your Mac draws more than this, so the battery gradually discharges." : " Sufficient for everyday work."),
+        fix: draining ? "For sustained large-model workloads, a 140 W charger with a 240 W cable is the next step. Otherwise no change is needed." : "", figs: figs };
+    }
+    return { level: draining ? "bad" : "warn",
+      head: watts + " W — below full rate",
+      body: "Your Mac is not receiving the power available to it. The cable, the charger, or the port is limiting the connection." + deficit,
+      fix: "Try another cable, move to the charger's primary port, and connect directly to mains rather than through a hub or display.", figs: figs };
+  }
+
+  /* ---------- render ---------- */
+  var TINT = {
+    good: "var(--pass)", warn: "var(--warn)",
+    bad: "var(--fail)", info: "var(--muted)"
+  };
+
+  function render(d) {
+    var r = diagnose(d);
+    var tint = TINT[r.level];
+
+    var figs = r.figs.map(function (f) {
+      return '<div><div class="lab">' + f[0] + '</div>' +
+             '<div class="num" style="font-size:22px;font-weight:600">' + f[1] +
+             '<span style="font-size:12px;color:var(--muted)"> ' + f[2] + '</span></div></div>';
+    }).join("");
+
+    resultEl.innerHTML =
+      '<div class="res-head"><div class="lab">Result</div>' +
+        '<div style="font-size:19px;font-weight:700;margin-top:4px;color:' + tint + '">' +
+          r.head + '</div></div>' +
+      '<div class="res-figs">' + figs + '</div>' +
+      '<div class="res-verdict"><p style="font-size:14.5px">' + r.body + '</p>' +
+        (r.fix
+          ? '<div class="res-fix" style="background:color-mix(in srgb, ' + tint + ' 12%, transparent)">' +
+            '<div class="lab" style="margin-bottom:4px">What to do</div>' + r.fix + '</div>'
+          : '') +
+      '</div>';
+    resultEl.classList.add("on");
+    resultEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
+  runEl.addEventListener("click", function () {
+    var text = pasteEl.value.trim();
+    if (!text) {
+      resultEl.innerHTML = '<div class="res-verdict"><p style="font-size:14.5px;color:var(--muted)">' +
+        'Paste the command output above first.</p></div>';
+      resultEl.classList.add("on");
+      return;
+    }
+    var parsed = parse(text);
+    if (parsed.Watts === undefined && parsed.CurrentCapacity === undefined) {
+      resultEl.innerHTML = '<div class="res-verdict"><p style="font-size:14.5px;color:var(--fail)">' +
+        'That does not look like output from the command above. Expected lines such as ' +
+        '<code>"Watts"=140</code>. Copy everything the command printed, including the quotes.</p></div>';
+      resultEl.classList.add("on");
+      return;
+    }
+    render(parsed);
+  });
+
+  clearEl.addEventListener("click", function () {
+    pasteEl.value = "";
+    resultEl.classList.remove("on");
+    resultEl.innerHTML = "";
+  });
+})();
+
 </script>
 </body>
 </html>
