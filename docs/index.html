@@ -1445,7 +1445,38 @@ footer p { max-width: 72ch; }
       </div>
     </div>
 
-    <div class="cta-row">
+    <h3 style="font-size:19px;margin:36px 0 8px">How it sits while you work</h3>
+    <p style="color:var(--muted);font-size:14px;margin-bottom:18px">
+      The wattage stays in the menu bar. Everything else appears only when you
+      click it. Below, a real panel: the supply is correct at 100&nbsp;W, but it
+      has offered 140&nbsp;W before, and oMLX is identified as the process
+      drawing against it.
+    </p>
+
+    <img src="images/menubar-panel.png"
+         alt="The Smart Charging menu bar panel: 100 W delivered, a notice that the charger has previously offered 140 W, and oMLX listed among the processes using the most CPU"
+         style="width:100%;max-width:520px;border-radius:6px;border:1px solid var(--line);display:block">
+
+    <div class="sym-grid" style="margin-top:22px">
+      <div class="sym">
+        <h3>Always the current figure</h3>
+        <p>The menu bar shows delivered wattage, updated every two seconds while the panel is open and every ten while it is not.</p>
+      </div>
+      <div class="sym">
+        <h3>Reports a drop</h3>
+        <p>Here the supply is working correctly, yet it has offered 140 W previously — a difference worth knowing, and one a single reading cannot show.</p>
+      </div>
+      <div class="sym">
+        <h3>Names the load</h3>
+        <p>Local inference runtimes are marked, so a deficit can be attributed to what is causing it rather than guessed at.</p>
+      </div>
+      <div class="sym">
+        <h3>Stays out of the way</h3>
+        <p>Closing the window leaves it measuring from the menu bar. Polling slows while nothing is on screen, so it costs very little of the power it measures.</p>
+      </div>
+    </div>
+
+    <div class="cta-row" style="margin-top:26px">
       <a class="btn btn-primary"
          href="https://github.com/bluehawana/mac-smartcharging-monitor/releases">
         Download for macOS
