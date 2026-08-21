@@ -20,6 +20,15 @@
 	<string>1</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>14.0</string>
+	<!-- Required by the Mac App Store; upload fails with error 90242 without
+	     it. Irrelevant to direct distribution, which is why it was missing. -->
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.utilities</string>
+	<!-- Declares no non-exempt encryption, which removes the export
+	     compliance question from every submission. Accurate here: the app
+	     makes no network requests and encrypts nothing. -->
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>NSHighResolutionCapable</key>
 	<true/>
 	<key>NSSupportsAutomaticTermination</key>
