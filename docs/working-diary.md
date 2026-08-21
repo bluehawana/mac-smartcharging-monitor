@@ -592,3 +592,72 @@ recommended path and needs no app-specific password at all.
    A decision, not a formality.
 3. Remaining listing fields: subtitle, category, copyright.
 4. Privacy label: Data Not Collected, which is accurate.
+
+---
+
+## 2026-08-21 (afternoon) — Submitted to the App Store
+
+Status: **1.0 Waiting for Review**, build 1.0.0 (2), Apple ID 6803880963.
+
+### Three rejections before the build was accepted
+
+**90886** — the signature was missing an application identifier while the
+provisioning profile carried one. Entitlements declared only the sandbox; App
+Store builds must also sign in com.apple.application-identifier and
+com.apple.developer.team-identifier, matching the profile exactly.
+
+**90242** — Info.plist must declare LSApplicationCategoryType. Meaningless for
+direct distribution, so it had never been needed.
+
+**91109** — com.apple.quarantine on Contents/embedded.provisionprofile. The
+profile is downloaded through a browser, macOS tags downloads with that
+attribute, and it travels into the bundle when copied. This one is the most
+instructive of the three: it passed upload validation and only failed minutes
+later during processing, so the terminal reported "UPLOAD SUCCEEDED" while
+TestFlight showed Failed and App Store Connect showed no icon. `xattr -cr` now
+runs before signing.
+
+The shared lesson: codesign and plutil verify a build that Apple then refuses.
+Local checks cannot substitute for an upload, and the failures arrive one at a
+time.
+
+### altool
+
+Three separate authentication failures — a notarytool flag it does not accept,
+a missing --item on the command meant to store a credential, and a refusal to
+take an Apple ID password where an app-specific one is required. None explained
+before failing. Omitting -p entirely, so it prompts on stdin, is what finally
+worked. Transporter remains the better tool.
+
+### Listing
+
+Name is "Smart Charging Monitor" — "Smart Charging" was taken. Everything else
+keeps the original name: renaming the repo, cask or site would break a shipped
+release for nothing, and store listing names routinely differ from product
+names.
+
+Content Rights declared as no third-party content. Age rating 4+ across 172
+countries. App Privacy published as Data Not Collected, which is accurate and
+verifiable — the privacy page documents how to confirm the absence of network
+activity independently. Sign-in requirement unticked, since the app has no
+accounts.
+
+Review notes explain where to find a menu bar app after launch, that a charger
+must be attached for meaningful values, and that reading AppleSmartBattery needs
+no entitlement beyond the sandbox. A reviewer who launches a menu bar app, sees
+the window close and finds nothing in the Dock could reasonably conclude it does
+nothing.
+
+### The icon question
+
+"Why no logo" had a real answer rather than a caching quirk: App Store Connect
+reads the icon from a processed build, and there was no processed build while
+91109 kept failing. The placeholder disappeared the moment build 2 completed.
+
+### Open
+
+1. Await review. 50% within 24 hours, 90% within 48.
+2. Publish the launch post. The site, direct download and Homebrew install all
+   work today regardless of the review outcome.
+3. SMC charge limit remains the intended paid feature, and remains impossible
+   in the App Store edition.
