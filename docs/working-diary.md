@@ -492,3 +492,103 @@ claiming anything.
   revalidation, then enable `https_enforced`.
 - **The 30 W capture** is still pre-fix and cannot ship. Three verified slides
   are ready via `screenshots-ready.json`.
+
+---
+
+## 2026-08-21 — Website rewritten, App Store submission prepared
+
+### Website
+
+Corrected a framing error worth recording. The cable table headed its
+right-hand column "Ceiling", which invites reading a 240 W cable rating as a
+charging rate. Apple does sell a 240 W cable, so the row was factually right;
+the column name was not. It now reads "Cable rating", with a callout stating
+that no Mac charges at 240 W — 140 W on the 16-inch MacBook Pro is the highest
+any model accepts — and a table of what each model actually draws.
+
+Rewrote the tone throughout. The headline was "Your charger is probably lying
+to you"; it is now "Know what your Mac is actually receiving". Section
+headings became descriptive, and the app section leads with the two things a
+reader cares about — sustained performance and battery longevity — described
+as mechanisms rather than claims.
+
+### Charger generation comparison
+
+Photographed the two UGREEN chargers together, four years apart, and read
+their labels. The rated totals (100 W against 200 W) are the wrong comparison.
+The 2022 CD226's highest rail is 20 V, so 100 W is a hardware ceiling that no
+cable can lift. 140 W requires the 28 V rail introduced with USB-PD 3.1, which
+a charger either offers or does not.
+
+Every label figure matched what the app measured — C1 140 W at 28 V, C2 100 W
+at 20 V, C3 30 W at 12 V, and the older unit 99 W at 20 V. That agreement is
+the actual argument: the specification is accurate and printed on the
+underside of the charger, and is simply never visible while you work.
+
+### In-browser analyser
+
+A native app cannot run in a browser, but the analysis can. The rules from
+Diagnosis.swift are ported to JavaScript and execute client-side, so a visitor
+can click a sample reading or paste one command's output from their own Mac.
+Nothing is uploaded, so no server is needed.
+
+Testing it caught a real bug: InstantAmperage exceeds Number.MAX_SAFE_INTEGER,
+so parseInt rounded it and the two's-complement conversion returned a wrong,
+often positive, value. Every discharging state was being read as charging.
+Fixed with BigInt.
+
+Also corrected an overclaim in the copy. "Check your own Mac in the browser —
+no install" implies clicking and seeing your own data; it actually requires
+running one command. The button now says "See a live reading", which is what
+pressing it does.
+
+### App Store submission
+
+Created the Apple Distribution and 3rd Party Mac Developer Installer
+certificates, registered com.bluehawana.smartcharging, and generated a Mac App
+Store provisioning profile, working through the portal in the browser. The key
+was generated with openssl and imported into the login keychain; no key
+material remains in the working tree, and every filename the portal produces is
+gitignored.
+
+App record created — Apple ID 6803880963. "Smart Charging" was already taken,
+so the listing is "Smart Charging Monitor". Everything else keeps the original
+name: renaming the repo, cask or site would break a shipped release for no
+gain, and store listing names routinely differ from product names.
+
+### Two upload rejections, both instructive
+
+**90886** — the signature was missing an application identifier while the
+provisioning profile had one. The entitlements declared only the sandbox; App
+Store builds must also carry com.apple.application-identifier and
+com.apple.developer.team-identifier in the signature itself.
+
+**90242** — Info.plist must declare LSApplicationCategoryType. Meaningless for
+direct distribution, so it had never been needed.
+
+Both share a shape worth remembering: codesign and plutil verified the build
+without complaint, and only Apple's upload validator knew what was missing.
+Local verification cannot substitute for an upload attempt, so these arrive one
+at a time.
+
+Added ITSAppUsesNonExemptEncryption = false while fixing the second. It is
+accurate and removes the export compliance question from every future
+submission.
+
+### altool
+
+Three separate failures: a notarytool flag it does not accept, a missing
+--item on the command meant to store a credential, and finally a refusal to
+accept an Apple ID password where an app-specific one is required — none of
+which it explains before failing. It is deprecated. Transporter is the
+recommended path and needs no app-specific password at all.
+
+### Open
+
+1. Upload the package. It is correct now; the last attempt failed on
+   authentication rather than on the build.
+2. EU trader status. Mandatory for a Sweden-based developer under the DSA, and
+   declaring it as an individual publishes name and address on the listing.
+   A decision, not a formality.
+3. Remaining listing fields: subtitle, category, copyright.
+4. Privacy label: Data Not Collected, which is accurate.
