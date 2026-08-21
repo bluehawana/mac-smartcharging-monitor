@@ -23,6 +23,17 @@ xcuserdata/
 *.certSigningRequest
 *.mobileprovision
 *.provisionprofile
+Smart_Charging_*.provisionprofile
 Resources/embedded.provisionprofile
 AuthKey_*
 secrets/
+
+# Certificate material. None of this belongs in a repository — the private key
+# lives in the login keychain, and certificates are re-downloadable from the
+# developer portal. Listed by extension and by the names the portal uses.
+*.certSigningRequest
+distribution.cer
+mac_installer.cer
+*_installer.cer
+csr/
+tmp/
