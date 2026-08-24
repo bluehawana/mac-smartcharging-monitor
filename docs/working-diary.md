@@ -661,3 +661,34 @@ reads the icon from a processed build, and there was no processed build while
    work today regardless of the review outcome.
 3. SMC charge limit remains the intended paid feature, and remains impossible
    in the App Store edition.
+
+## 2026-08-24 — Review came back: information, not a bug
+
+Apple replied within a day, as the statistics promised, and the result is the
+common first outcome: Guideline 2.1, Information Needed. No defect found —
+they want seven things before continuing, the most substantial being a screen
+recording captured on a physical device that starts at launch and walks the
+core features.
+
+The other six are text, and all of them were already answerable from the
+existing docs: devices tested, what the app does and for whom, setup steps,
+external services (none), regional differences (none), regulated content
+(none). Drafted as `APPSTORE-REVIEW-REPLY.md` — paste into the App Review
+reply and into App Review Information → Notes, which Apple asks for so the
+next submission carries the answers up front.
+
+One near-miss: the draft originally lived in `docs/appstore/`, which is
+gitignored for the screenshot sets. It would have silently stayed out of the
+repository. Moved to the root beside `APPSTORE.md` and `APPSTORE-LISTING.md`.
+
+The recording script is at the top of the reply file: launch the sandboxed
+build with a charger attached, show the dashboard, close it to prove the menu
+bar item keeps measuring, change ports so the diagnosis visibly changes, quit.
+Under two minutes. There are no logins, purchases or permission prompts to
+demonstrate, which makes this the easy version of the request.
+
+### Open
+
+1. Record the video on this machine and attach it to the reply.
+2. Paste the reply text in App Store Connect; copy into Review Notes.
+3. Review resumes after the reply; the build itself needs no change.
